@@ -20,6 +20,7 @@ import { ExploreAsScreen } from "./ExploreAsScreen";
 import { PassportPanel } from "./PassportPanel";
 import { PayCategoryScreen } from "./PayCategoryScreen";
 import { RfpCategoryScreen } from "./RfpCategoryScreen";
+import { WhatsLiveScreen } from "./WhatsLiveScreen";
 
 const IndiaMap = dynamic(
   () => import("./IndiaMap").then((m) => m.IndiaMap),
@@ -167,7 +168,13 @@ export function HomeExperience() {
 
         {activeScreen === "story" && <ComingNext heading="Artisan's story" />}
 
-        {activeScreen === "whats-live" && <ComingNext heading="What's live" />}
+        {activeScreen === "whats-live" && (
+          <WhatsLiveScreen
+            onOpenPassport={() =>
+              setScreen(role === "steward" ? "passports" : "passport")
+            }
+          />
+        )}
 
         {(activeScreen === "home" ||
           activeScreen === "artisans" ||
