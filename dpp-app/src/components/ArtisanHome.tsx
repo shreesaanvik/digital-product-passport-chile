@@ -1,0 +1,394 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useState, type ReactNode } from "react";
+import {
+  ARTISAN,
+  artisanPaymentStatus,
+  artisanPaymentTotals,
+  formatInr,
+} from "@/lib/data";
+import { PassportPanel } from "./PassportPanel";
+
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
+
+const largeButtonClass =
+  "btn-primary flex w-full min-h-[56px] items-center justify-center text-lg font-semibold";
+
+export type ArtisanPanel = "home" | "work" | "money" | "passport" | "steward";
+
+const TILES: { id: Exclude<ArtisanPanel, "home">; label: string }[] = [
+  { id: "work", label: "My work" },
+  { id: "money", label: "My money" },
+  { id: "passport", label: "My passport" },
+  { id: "steward", label: "My steward" },
+];
+
+type Props = {
+  panel: ArtisanPanel;
+  onPanel: (panel: ArtisanPanel) => void;
+};
+
+export function ArtisanHome({ panel, onPanel }: Props) {
+  const back = () => onPanel("home");
+
+  if (panel === "work") return <WorkDetail onBack={back} />;
+  if (panel === "money") return <MoneyDetail onBack={back} />;
+  if (panel === "passport") return <PassportDetail onBack={back} />;
+  if (panel === "steward") return <StewardDetail onBack={back} />;
+
+  const firstName = ARTISAN.name.split(" ")[0];
+  const stage = ARTISAN.stages[ARTISAN.currentStage];
+
+  return (
+    <div className="text-lg text-fm-ink">
+      <h1 className="font-display text-2xl font-semibold leading-tight text-fm-ink">
+        Namaste, {firstName}
+      </h1>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {TILES.map((tile) => (
+          <button
+            key={tile.id}
+            type="button"
+            onClick={() => onPanel(tile.id)}
+            className="flex min-h-[8.75rem] flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center text-fm-ink shadow-neu active:bg-fm-btn-light"
+          >
+            <TileIcon id={tile.id} />
+            <span className="font-display text-2xl font-semibold leading-tight">
+              {tile.label}
+            </span>
+          </button>
+        ))}
+      </div>
+      <p className="mt-4 text-lg font-semibold leading-snug text-fm-ink" role="status">
+        Your order is at: {stage}
+      </p>
+    </div>
+  );
+}
+
+export function ArtisanHero({
+  title,
+  subtitle,
+  titleAs = "p",
+}: {
+  title: string;
+  subtitle: string;
+  titleAs?: "h1" | "p";
+}) {
+  const TitleTag = titleAs;
+
+  return (
+    <div className="relative h-64 w-full overflow-hidden rounded-2xl">
+      <Image
+        src={HERO_IMAGE}
+        alt=""
+        fill
+        sizes="(max-width: 512px) 100vw, 512px"
+        className="object-cover object-center"
+        priority
+      />
+      <div
+        className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/15"
+        aria-hidden
+      />
+      <div className="absolute inset-x-0 bottom-0 p-5">
+        <TitleTag className="font-display text-2xl font-semibold leading-tight text-white">
+          {title}
+        </TitleTag>
+        <p className="mt-1 text-lg leading-snug text-white">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
+export function ArtisanMoneyPanel() {
+  const totals = artisanPaymentTotals(ARTISAN.payments);
+
+  return (
+    <div className="text-lg text-fm-ink">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center shadow-neu">
+          <span
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-fm-green text-white"
+            aria-hidden
+          >
+            <CheckIcon />
+          </span>
+          <p className="font-semibold">Received</p>
+          <p className="font-display text-2xl font-semibold leading-tight">
+            {formatInr(totals.received)}
+          </p>
+        </div>
+        <div className="flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center shadow-neu">
+          <span className="flex h-12 w-12 items-center justify-center text-fm-blue" aria-hidden>
+            <ClockIcon />
+          </span>
+          <p className="font-semibold">Waiting</p>
+          <p className="font-display text-2xl font-semibold leading-tight">
+            {formatInr(totals.waiting)}
+          </p>
+        </div>
+      </div>
+      <ul className="mt-4 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white px-4 shadow-neu">
+        {ARTISAN.payments.map((payment) => (
+          <li
+            key={payment.label}
+            className="flex min-h-[56px] items-center justify-between gap-3 py-3"
+          >
+            <div>
+              <p className="font-semibold text-fm-ink">{payment.label}</p>
+              <p className="text-fm-ink">{artisanPaymentStatus(payment)}</p>
+            </div>
+            <p className="shrink-0 font-display text-xl font-semibold text-fm-ink">
+              {formatInr(payment.amount)}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function DetailShell({
+  title,
+  onBack,
+  children,
+}: {
+  title: string;
+  onBack: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="text-lg text-fm-ink">
+      <button type="button" onClick={onBack} className={largeButtonClass}>
+        Back
+      </button>
+      <h1 className="mt-4 font-display text-2xl font-semibold text-fm-ink">{title}</h1>
+      <div className="mt-4">{children}</div>
+    </div>
+  );
+}
+
+function WorkDetail({ onBack }: { onBack: () => void }) {
+  return (
+    <DetailShell title="My work" onBack={onBack}>
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-neu">
+        <p className="font-display text-2xl font-semibold text-fm-ink">{ARTISAN.order.code}</p>
+        <p className="mt-2 text-lg text-fm-ink">{ARTISAN.order.product}</p>
+        <p className="mt-1 text-lg text-fm-ink">Buyer: {ARTISAN.order.buyer}</p>
+      </div>
+      <ol className="mt-4 space-y-2" aria-label="Order stages">
+        {ARTISAN.stages.map((stage, index) => {
+          const state =
+            index < ARTISAN.currentStage ? "done" : index === ARTISAN.currentStage ? "now" : "later";
+          return (
+            <li
+              key={stage}
+              className={`flex min-h-[56px] items-center gap-3 rounded-xl px-3 ${
+                state === "now" ? "border-2 border-fm-blue bg-fm-btn-light" : ""
+              }`}
+            >
+              <StageMark state={state} index={index} />
+              <span
+                className={`min-w-0 flex-1 text-lg ${
+                  state === "later" ? "text-slate-500" : "font-semibold text-fm-ink"
+                }`}
+              >
+                {state === "done" && <span className="sr-only">Done. </span>}
+                {stage}
+              </span>
+              {state === "now" && (
+                <span className="shrink-0 rounded-full bg-fm-btn-bg px-3 py-1 text-base font-semibold text-white">
+                  Now
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </DetailShell>
+  );
+}
+
+function MoneyDetail({ onBack }: { onBack: () => void }) {
+  return (
+    <DetailShell title="My money" onBack={onBack}>
+      <ArtisanMoneyPanel />
+    </DetailShell>
+  );
+}
+
+function PassportDetail({ onBack }: { onBack: () => void }) {
+  const [showFull, setShowFull] = useState(false);
+
+  return (
+    <DetailShell title="My passport" onBack={onBack}>
+      <ArtisanHero
+        title={ARTISAN.name}
+        subtitle={`${ARTISAN.craft}, ${ARTISAN.cluster}`}
+      />
+      <p className="mt-4 text-lg text-fm-ink">Buyers who scan the label see this</p>
+      <button
+        type="button"
+        onClick={() => setShowFull(true)}
+        className={`${largeButtonClass} mt-4`}
+        aria-expanded={showFull}
+      >
+        See full passport
+      </button>
+      {showFull && (
+        <div className="mt-4">
+          <PassportPanel heritageName="Kutch" heritageCraft="Ajrakh block-print" />
+        </div>
+      )}
+    </DetailShell>
+  );
+}
+
+function StewardDetail({ onBack }: { onBack: () => void }) {
+  const [callId, setCallId] = useState(0);
+  const stewardFirst = ARTISAN.steward.name.split(" ")[0];
+
+  useEffect(() => {
+    if (callId === 0) return;
+    const timer = window.setTimeout(() => setCallId(0), 2000);
+    return () => window.clearTimeout(timer);
+  }, [callId]);
+
+  return (
+    <DetailShell title="My steward" onBack={onBack}>
+      <div className="flex items-center gap-4">
+        <div
+          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-fm-blue font-display text-4xl font-bold text-white"
+          aria-hidden
+        >
+          {ARTISAN.steward.name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-display text-2xl font-semibold leading-tight text-fm-ink">
+            {ARTISAN.steward.name}
+          </p>
+          <p className="mt-1 text-lg text-fm-ink">{ARTISAN.steward.role}</p>
+          <p className="mt-1 text-lg text-fm-ink">Last visit: {ARTISAN.steward.lastVisit}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => setCallId((id) => id + 1)}
+        className={`${largeButtonClass} mt-6`}
+      >
+        Call {stewardFirst}
+      </button>
+      <p className="mt-3 min-h-[1.75rem] text-lg font-semibold text-fm-ink" role="status">
+        {callId > 0 ? `Calling ${ARTISAN.steward.name}...` : ""}
+      </p>
+    </DetailShell>
+  );
+}
+
+function StageMark({ state, index }: { state: "done" | "now" | "later"; index: number }) {
+  if (state === "done") {
+    return (
+      <span
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-fm-green text-white"
+        aria-hidden
+      >
+        <CheckIcon />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
+        state === "now" ? "bg-fm-btn-bg text-white" : "bg-slate-200 text-slate-500"
+      }`}
+      aria-hidden
+    >
+      {index + 1}
+    </span>
+  );
+}
+
+function TileIcon({ id }: { id: (typeof TILES)[number]["id"] }) {
+  const className = "h-12 w-12 text-fm-blue";
+  if (id === "work") return <WorkIcon className={className} />;
+  if (id === "money") return <MoneyIcon className={className} />;
+  if (id === "passport") return <PassportIcon className={className} />;
+  return <StewardIcon className={className} />;
+}
+
+function WorkIcon({ className }: { className: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none" aria-hidden>
+      <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" strokeWidth="2.5" />
+      <rect x="16" y="16" width="16" height="16" rx="2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function MoneyIcon({ className }: { className: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <circle cx="24" cy="24" r="16" fill="none" stroke="currentColor" strokeWidth="2.5" />
+      <text
+        x="24"
+        y="31"
+        textAnchor="middle"
+        fontSize="20"
+        fontWeight="700"
+        fill="currentColor"
+      >
+        ₹
+      </text>
+    </svg>
+  );
+}
+
+function PassportIcon({ className }: { className: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none" aria-hidden>
+      <rect x="11" y="6" width="26" height="36" rx="3" stroke="currentColor" strokeWidth="2.5" />
+      <path d="M17 16h14M17 24h14M17 32h8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function StewardIcon({ className }: { className: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none" aria-hidden>
+      <circle cx="24" cy="16" r="7" stroke="currentColor" strokeWidth="2.5" />
+      <path
+        d="M10 40c2.2-8 7.6-12 14-12s11.8 4 14 12"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 48 48" className="h-6 w-6" fill="none" aria-hidden>
+      <path
+        d="M12 25l8 8 16-18"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg viewBox="0 0 48 48" className="h-12 w-12" fill="none" aria-hidden>
+      <circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="2.5" />
+      <path d="M24 14v11l7 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}

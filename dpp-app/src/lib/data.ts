@@ -72,6 +72,64 @@ export const CLUSTERS = [
   },
 ] as const;
 
+export type ArtisanPayment = {
+  label: string;
+  amount: number;
+  status: "paid" | "waiting";
+  date?: string;
+};
+
+export const ARTISAN = {
+  name: "Lalita Rabari",
+  craft: "Ajrakh block-print",
+  cluster: "Kutch, Gujarat",
+  generation: "Third-generation block-printer",
+  steward: { name: "Priya Chauhan", role: "Steward, Kutch", lastVisit: "28 Sep" },
+  order: {
+    code: "FM-KUT-2026",
+    product: "Ajrakh cotton fabric, 20 metres",
+    buyer: "Maren Voss studio",
+  },
+  stages: [
+    "Fabric preparation",
+    "Block printing",
+    "Dyeing and washing",
+    "Quality check",
+    "Shipped",
+  ],
+  currentStage: 3,
+  payments: [
+    { label: "Order started", amount: 12600, status: "paid", date: "12 Sep" },
+    { label: "After quality check", amount: 16800, status: "waiting" },
+    { label: "After shipping", amount: 12600, status: "waiting" },
+  ] satisfies ArtisanPayment[],
+  currency: "INR",
+};
+
+export function formatInr(amount: number): string {
+  const grouped = new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 0,
+  }).format(amount);
+  return `₹${grouped.replace(/\s/g, "")}`;
+}
+
+export function artisanPaymentTotals(payments: readonly ArtisanPayment[]) {
+  let received = 0;
+  let waiting = 0;
+  for (const payment of payments) {
+    if (payment.status === "paid") received += payment.amount;
+    else waiting += payment.amount;
+  }
+  return { received, waiting };
+}
+
+export function artisanPaymentStatus(payment: ArtisanPayment): string {
+  if (payment.status === "paid") return payment.date ? `Paid ${payment.date}` : "Paid";
+  if (payment.label === "After quality check") return "When quality check is done";
+  if (payment.label === "After shipping") return "When shipped";
+  return "Waiting";
+}
+
 export const PASSPORT_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Product",

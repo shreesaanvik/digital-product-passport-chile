@@ -21,6 +21,8 @@ import { PassportPanel } from "./PassportPanel";
 import { PayCategoryScreen } from "./PayCategoryScreen";
 import { RfpCategoryScreen } from "./RfpCategoryScreen";
 import { FeaturesScreen } from "./FeaturesScreen";
+import { ArtisanHome, type ArtisanPanel } from "./ArtisanHome";
+import { ArtisanStory } from "./ArtisanStory";
 
 const IndiaMap = dynamic(
   () => import("./IndiaMap").then((m) => m.IndiaMap),
@@ -37,15 +39,6 @@ const IndiaMap = dynamic(
     ),
   },
 );
-
-function ComingNext({ heading }: { heading: string }) {
-  return (
-    <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-neu">
-      <h1 className="font-display text-2xl font-semibold text-fm-blue">{heading}</h1>
-      <p className="mt-2 text-fm-muted">Coming in the next step</p>
-    </div>
-  );
-}
 
 function BuiltLater() {
   return (
@@ -65,6 +58,7 @@ export function HomeExperience() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [screen, setScreen] = useState<AppScreen>(role ? defaultScreen(role) : "home");
   const [screenRole, setScreenRole] = useState<Role | null>(role);
+  const [artisanPanel, setArtisanPanel] = useState<ArtisanPanel>("home");
   const seenRole = useRef(role);
 
   const activeScreen: AppScreen =
@@ -79,6 +73,7 @@ export function HomeExperience() {
     seenRole.current = role;
     setScreenRole(role);
     setScreen(role ? defaultScreen(role) : "home");
+    setArtisanPanel("home");
     setMenuOpen(false);
   }, [role]);
 
@@ -166,7 +161,18 @@ export function HomeExperience() {
 
         {activeScreen === "pay" && <PayCategoryScreen />}
 
-        {activeScreen === "story" && <ComingNext heading="Artisan's story" />}
+        {activeScreen === "story" && (
+          <ArtisanStory
+            onOpenPassport={() => {
+              if (role === "artisan") {
+                setArtisanPanel("passport");
+                setScreen("home");
+                return;
+              }
+              setScreen(role === "steward" ? "passports" : "passport");
+            }}
+          />
+        )}
 
         {activeScreen === "whats-live" && (
           <FeaturesScreen
@@ -176,9 +182,13 @@ export function HomeExperience() {
           />
         )}
 
-        {(activeScreen === "home" ||
-          activeScreen === "artisans" ||
-          activeScreen === "order") && <BuiltLater />}
+        {role === "artisan" && activeScreen === "home" && (
+          <ArtisanHome panel={artisanPanel} onPanel={setArtisanPanel} />
+        )}
+
+        {(activeScreen === "artisans" ||
+          activeScreen === "order" ||
+          (activeScreen === "home" && role !== "artisan")) && <BuiltLater />}
       </main>
 
       {tabs.length > 0 && (
