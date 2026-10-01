@@ -24,19 +24,36 @@ const BADGES = [
 type PassportPanelProps = {
   heritageName: string;
   heritageCraft: string;
+  defaultShowTech?: boolean;
 };
 
 export function PassportPanel({
   heritageName,
   heritageCraft,
+  defaultShowTech = false,
 }: PassportPanelProps) {
-  const [showTech, setShowTech] = useState(false);
+  const [showTech, setShowTech] = useState(defaultShowTech);
 
   return (
     <section
       className="rounded-2xl bg-fm-card p-5 shadow-neu border border-white overflow-hidden"
       aria-labelledby="passport-heading"
     >
+      <div className="mb-4 flex items-center gap-3">
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-2 border-fm-blue/20 bg-white"
+          role="img"
+          aria-label="Demo QR code placeholder"
+        >
+          <span className="text-xl text-fm-blue/40" aria-hidden>
+            ▣
+          </span>
+        </div>
+        <p className="text-xs text-fm-muted leading-snug">
+          Scan on a real label → opens this passport
+        </p>
+      </div>
+
       <h2
         id="passport-heading"
         className="font-display text-xl font-semibold text-fm-blue mb-1"
@@ -52,7 +69,7 @@ export function PassportPanel({
         <div className="relative h-[200px] w-full overflow-hidden">
           <Image
             src={ARTISAN_HERO_IMAGE}
-            alt={`Artisan at a weaving loom — ${heritageName}, ${heritageCraft}`}
+            alt={`Artisan at a weaving loom, ${heritageName}, ${heritageCraft}`}
             fill
             sizes="(max-width: 512px) 100vw, 512px"
             className="object-cover object-center scale-105"

@@ -151,7 +151,7 @@ export function IndiaMap({ selectedId, onSelect, matchedIds = null }: Props) {
                 }}
               >
                 <Tooltip direction="top" offset={[0, -8]} opacity={0.92}>
-                  {c.name} — {c.craft}
+                  {c.name}, {c.craft}
                 </Tooltip>
               </CircleMarker>
             </Fragment>

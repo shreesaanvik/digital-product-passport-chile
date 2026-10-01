@@ -1,27 +1,21 @@
 "use client";
 
-import type { MainNavTab } from "./NavMenuDrawer";
+import type { AppScreen, BottomTab } from "@/lib/roles";
 
 type Props = {
-  active: MainNavTab;
-  onChange: (t: MainNavTab) => void;
+  tabs: BottomTab[];
+  active: AppScreen | null;
+  onChange: (tab: AppScreen) => void;
 };
 
-const NAV: { id: MainNavTab; label: string; icon: string }[] = [
-  { id: "home", label: "Home", icon: "⌂" },
-  { id: "rfp", label: "RFPs", icon: "📁" },
-  { id: "pay", label: "Pay", icon: "$" },
-  { id: "reports", label: "Reports", icon: "▤" },
-];
-
-export function BottomNav({ active, onChange }: Props) {
+export function BottomNav({ tabs, active, onChange }: Props) {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md safe-area-pb"
       aria-label="Main"
     >
       <div className="mx-auto flex max-w-lg justify-around px-2 py-2">
-        {NAV.map((item) => {
+        {tabs.map((item) => {
           const isActive = active === item.id;
           return (
             <button

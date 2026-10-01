@@ -1,36 +1,31 @@
 "use client";
 
 import { useEffect } from "react";
+import type { AppScreen } from "@/lib/roles";
 
-export type MainNavTab = "home" | "rfp" | "pay" | "reports";
+type MenuScreen = Extract<AppScreen, "story" | "pay" | "whats-live">;
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSelectTab: (tab: MainNavTab) => void;
-  activeTab: MainNavTab;
+  onSwitchRole: () => void;
+  onOpenScreen: (screen: MenuScreen) => void;
+  activeScreen: AppScreen | null;
 };
 
-const ITEMS: { id: MainNavTab; title: string; description: string }[] = [
-  {
-    id: "home",
-    title: "Home",
-    description: "Map, impact, ID check & passport",
-  },
-  {
-    id: "rfp",
-    title: "RFPs & sourcing",
-    description: "Requests and direct sourcing",
-  },
-  { id: "pay", title: "Pay", description: "Where the money goes" },
-  { id: "reports", title: "Reports", description: "Impact & export checks" },
+const ITEMS: { id: "switch-role" | MenuScreen; title: string }[] = [
+  { id: "switch-role", title: "Switch role" },
+  { id: "story", title: "Artisan's story" },
+  { id: "pay", title: "Pay" },
+  { id: "whats-live", title: "What's live" },
 ];
 
 export function NavMenuDrawer({
   open,
   onClose,
-  onSelectTab,
-  activeTab,
+  onSwitchRole,
+  onOpenScreen,
+  activeScreen,
 }: Props) {
   useEffect(() => {
     if (!open) return;
@@ -87,13 +82,16 @@ export function NavMenuDrawer({
         <nav className="flex-1 overflow-y-auto px-2 py-3" aria-label="App sections">
           <ul className="flex flex-col gap-1">
             {ITEMS.map((item) => {
-              const isActive = activeTab === item.id;
+              const isActive = item.id !== "switch-role" && activeScreen === item.id;
               return (
                 <li key={item.id}>
                   <button
                     type="button"
-                    onClick={() => onSelectTab(item.id)}
-                    className={`w-full rounded-xl px-4 py-3 text-left transition-colors ${
+                    onClick={() => {
+                      if (item.id === "switch-role") onSwitchRole();
+                      else onOpenScreen(item.id);
+                    }}
+                    className={`w-full min-h-[52px] rounded-xl px-4 py-3 text-left transition-colors ${
                       isActive
                         ? "bg-fm-btn-light border border-fm-blue/25"
                         : "hover:bg-fm-surface border border-transparent"
@@ -105,9 +103,6 @@ export function NavMenuDrawer({
                       }`}
                     >
                       {item.title}
-                    </span>
-                    <span className="mt-0.5 block text-sm text-fm-muted">
-                      {item.description}
                     </span>
                   </button>
                 </li>

@@ -75,7 +75,7 @@ export const CLUSTERS = [
 export const PASSPORT_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Product",
-  name: "Hand-loomed Silk Saree — Order FM-VNS-2026",
+  name: "Hand-loomed Silk Saree - Order FM-VNS-2026",
   material: "Mulberry silk, zari (tested)",
   countryOfOrigin: { "@type": "Country", name: "IN" },
   additionalProperty: [
