@@ -24,7 +24,11 @@ function formatStamp(date: Date) {
   return `${day}, ${time}`;
 }
 
-export function ProofOfHandDemo() {
+type ProofOfHandDemoProps = {
+  onRecorded?: () => void;
+};
+
+export function ProofOfHandDemo({ onRecorded }: ProofOfHandDemoProps = {}) {
   const [recordedAt, setRecordedAt] = useState<Date | null>(null);
   const when = recordedAt ? formatStamp(recordedAt) : "";
 
@@ -57,7 +61,10 @@ export function ProofOfHandDemo() {
         </div>
         <button
           type="button"
-          onClick={() => setRecordedAt(new Date())}
+          onClick={() => {
+            setRecordedAt(new Date());
+            onRecorded?.();
+          }}
           disabled={recordedAt != null}
           className="my-3 min-h-[48px] w-full rounded-full bg-white text-base font-semibold text-fm-ink disabled:opacity-70"
         >

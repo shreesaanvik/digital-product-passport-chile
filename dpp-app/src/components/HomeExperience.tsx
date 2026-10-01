@@ -23,6 +23,7 @@ import { RfpCategoryScreen } from "./RfpCategoryScreen";
 import { FeaturesScreen } from "./FeaturesScreen";
 import { ArtisanHome, type ArtisanPanel } from "./ArtisanHome";
 import { ArtisanStory } from "./ArtisanStory";
+import { StewardExperience } from "./StewardExperience";
 
 const IndiaMap = dynamic(
   () => import("./IndiaMap").then((m) => m.IndiaMap),
@@ -149,7 +150,12 @@ export function HomeExperience() {
           </>
         )}
 
-        {(activeScreen === "passport" || activeScreen === "passports") && (
+        {role === "steward" &&
+          (activeScreen === "artisans" || activeScreen === "passports") && (
+            <StewardExperience screen={activeScreen} />
+          )}
+
+        {activeScreen === "passport" && (
           <PassportPanel
             heritageName={cluster?.name ?? "Kutch"}
             heritageCraft={cluster?.craft ?? "Ajrakh Block-Print"}
@@ -186,9 +192,9 @@ export function HomeExperience() {
           <ArtisanHome panel={artisanPanel} onPanel={setArtisanPanel} />
         )}
 
-        {(activeScreen === "artisans" ||
-          activeScreen === "order" ||
-          (activeScreen === "home" && role !== "artisan")) && <BuiltLater />}
+        {(activeScreen === "order" ||
+          (activeScreen === "home" && role !== "artisan") ||
+          (activeScreen === "artisans" && role !== "steward")) && <BuiltLater />}
       </main>
 
       {tabs.length > 0 && (

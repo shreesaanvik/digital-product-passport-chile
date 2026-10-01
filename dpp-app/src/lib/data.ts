@@ -106,6 +106,91 @@ export const ARTISAN = {
   currency: "INR",
 };
 
+export const STEWARD = {
+  name: "Priya Chauhan",
+  role: "Steward",
+  area: "Kutch, Gujarat",
+} as const;
+
+export type RosterStatus = "Verified" | "Needs visit" | "Consent pending";
+
+export type StewardConsent = {
+  date: string;
+  language: string;
+};
+
+export type RosterArtisan = {
+  id: string;
+  name: string;
+  craft: string;
+  village: string;
+  status: RosterStatus;
+  consent: StewardConsent | null;
+  orderCode: string | null;
+};
+
+export const ROSTER: RosterArtisan[] = [
+  {
+    id: "KUT-4410",
+    name: "Lalita Rabari",
+    craft: "Ajrakh block-print",
+    village: "Ajrakhpur",
+    status: "Verified",
+    consent: { date: "2 Sep", language: "Kutchi" },
+    orderCode: "FM-KUT-2026",
+  },
+  {
+    id: "KUT-4417",
+    name: "Aamir Khatri",
+    craft: "Ajrakh block-print",
+    village: "Ajrakhpur",
+    status: "Verified",
+    consent: { date: "3 Sep", language: "Kutchi" },
+    orderCode: null,
+  },
+  {
+    id: "KUT-4502",
+    name: "Rekha Vankar",
+    craft: "Handloom weaving",
+    village: "Bhujodi",
+    status: "Needs visit",
+    consent: { date: "20 Aug", language: "Gujarati" },
+    orderCode: null,
+  },
+  {
+    id: "KUT-4521",
+    name: "Kanku Ahir",
+    craft: "Ahir embroidery",
+    village: "Dhaneti",
+    status: "Consent pending",
+    consent: null,
+    orderCode: null,
+  },
+  {
+    id: "KUT-4533",
+    name: "Hasina Khatri",
+    craft: "Bandhani",
+    village: "Bhuj",
+    status: "Verified",
+    consent: { date: "5 Sep", language: "Kutchi" },
+    orderCode: null,
+  },
+];
+
+export type EvidenceEntry = {
+  stage: string;
+  date: string;
+};
+
+export const EVIDENCE_GPS = "23.24 N, 69.67 E";
+
+export const EVIDENCE_LOG: EvidenceEntry[] = [
+  { stage: "Fabric preparation", date: "12 Sep, 10:14" },
+  { stage: "Block printing", date: "18 Sep, 11:02" },
+  { stage: "Dyeing and washing", date: "24 Sep, 09:40" },
+  { stage: "Quality check started", date: "28 Sep, 15:25" },
+];
+
 export function formatInr(amount: number): string {
   const grouped = new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 0,

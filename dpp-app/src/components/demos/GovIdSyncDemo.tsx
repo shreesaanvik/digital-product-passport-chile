@@ -20,6 +20,14 @@ const SAMPLE_RECORDS = {
 
 type SampleId = keyof typeof SAMPLE_RECORDS;
 
+export type VerifiedGovId = {
+  id: SampleId;
+  name: string;
+  craft: string;
+  cluster: string;
+  years: number;
+};
+
 const SAMPLE_IDS = Object.keys(SAMPLE_RECORDS) as SampleId[];
 
 function isSampleId(value: string): value is SampleId {
@@ -28,7 +36,11 @@ function isSampleId(value: string): value is SampleId {
 
 type Phase = "idle" | "searching" | "found" | "missing";
 
-export function GovIdSyncDemo() {
+type Props = {
+  onVerified?: (profile: VerifiedGovId | null) => void;
+};
+
+export function GovIdSyncDemo({ onVerified }: Props = {}) {
   const [id, setId] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [profile, setProfile] = useState<(typeof SAMPLE_RECORDS)[SampleId] | null>(
@@ -57,14 +69,17 @@ export function GovIdSyncDemo() {
 
     if (!isSampleId(key)) {
       setPhase("missing");
+      onVerified?.(null);
       return;
     }
 
     const record = SAMPLE_RECORDS[key];
     setPhase("searching");
+    onVerified?.(null);
     timer.current = window.setTimeout(() => {
       setProfile(record);
       setPhase("found");
+      onVerified?.({ id: key, ...record });
       timer.current = null;
     }, 1500);
   }
@@ -87,6 +102,7 @@ export function GovIdSyncDemo() {
             setPhase("idle");
             setProfile(null);
             clearTimer();
+            onVerified?.(null);
           }}
           className="min-h-[52px] flex-1 rounded-xl border-2 border-slate-200 px-4 text-lg text-fm-ink placeholder:text-slate-400 focus:border-fm-blue focus:outline-none"
         />
