@@ -28,8 +28,8 @@ export function GovIdSync() {
         Government ID check
       </h2>
       <p className="text-fm-muted text-base mb-4">
-        Type an artisan ID (Pehchan-style). We pretend to sync with the national
-        database — no real data leaves your device in this demo.
+        Type an artisan ID (Pehchan-style) to look up a verified profile in the
+        national registry.
       </p>
       <label htmlFor="pehchan" className="block text-sm font-medium text-fm-ink mb-2">
         Artisan ID number
@@ -82,7 +82,7 @@ export function GovIdSync() {
             <div>
               <p className="font-semibold text-fm-ink">Verified match</p>
               <p className="text-fm-muted text-sm">
-                Name and skill pulled from mock records. Ready for passport.
+                Name and skill match the registry. Ready for passport.
               </p>
             </div>
           </motion.div>

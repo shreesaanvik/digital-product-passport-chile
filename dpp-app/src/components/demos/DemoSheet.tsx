@@ -12,7 +12,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 type Props = {
   open: boolean;
   title: string;
-  simulated: boolean;
   onClose: () => void;
   onReset: () => void;
   children: ReactNode;
@@ -21,14 +20,7 @@ type Props = {
 const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function DemoSheet({
-  open,
-  title,
-  simulated,
-  onClose,
-  onReset,
-  children,
-}: Props) {
+export function DemoSheet({ open, title, onClose, onReset, children }: Props) {
   const reduce = useReducedMotion();
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -79,7 +71,7 @@ export function DemoSheet({
   return (
     <AnimatePresence>
       {open && (
-        <div key="demo-sheet" className="fixed inset-0 z-[80] flex items-end justify-center">
+        <div key="feature-sheet" className="fixed inset-0 z-[80] flex items-end justify-center">
           <motion.div
             className="absolute inset-0 bg-fm-ink/40"
             aria-hidden
@@ -123,14 +115,6 @@ export function DemoSheet({
                 </span>
               </button>
             </div>
-            {simulated && (
-              <p
-                className="border-b border-amber-300 bg-amber-100 px-4 py-3 text-sm font-medium text-amber-950"
-                role="note"
-              >
-                Simulated demo. This feature is planned and not connected to real systems.
-              </p>
-            )}
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
               {children}
             </div>

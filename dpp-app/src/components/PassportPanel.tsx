@@ -43,7 +43,7 @@ export function PassportPanel({
         <div
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-2 border-fm-blue/20 bg-white"
           role="img"
-          aria-label="Demo QR code placeholder"
+          aria-label="QR code"
         >
           <span className="text-xl text-fm-blue/40" aria-hidden>
             ▣

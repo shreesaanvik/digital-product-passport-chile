@@ -38,6 +38,9 @@ export function AppHeader({ onMenuClick, menuOpen, initial, tooltip }: Props) {
           <p className="text-xs text-fm-ink -mt-0.5">
             Digital Product Passport
           </p>
+          <span className="mt-1 inline-flex items-center rounded-full border-[1.5px] border-[#0081A1] bg-white px-2 py-0.5 text-[11px] font-semibold leading-none text-[#006E8A]">
+            Demo
+          </span>
         </div>
         <div
           className="flex h-11 w-11 items-center justify-center rounded-full bg-fm-blue text-white font-display font-bold text-xl shadow-md"

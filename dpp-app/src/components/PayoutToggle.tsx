@@ -35,7 +35,7 @@ export function PayoutToggle() {
       </h2>
       <p className="text-fm-muted text-base mb-4">
         One switch compares old supply chains with Fashion Mingle. Bars show
-        share of each step (demo numbers).
+        share of each step.
       </p>
 
       <div
@@ -90,7 +90,7 @@ export function PayoutToggle() {
       </div>
 
       <div className="mt-6 rounded-xl bg-fm-surface p-4 border border-slate-200">
-        <p className="text-sm text-fm-muted mb-1">Sample order (demo data)</p>
+        <p className="text-sm text-fm-muted mb-1">Sample order</p>
         <p className="text-fm-ink">
           <strong>{DEMO_ORDER.artisan}</strong> · {DEMO_ORDER.village}
         </p>

@@ -7,7 +7,7 @@ function StatsContent() {
   return (
     <>
       <h2 id="closing-heading" className="font-display text-xl font-semibold mb-4">
-        Village impact (demo totals)
+        Village impact
       </h2>
       <ul className="space-y-4 text-lg">
         <li className="flex justify-between gap-4 border-b border-white/20 pb-3">

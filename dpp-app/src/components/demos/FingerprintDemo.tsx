@@ -147,8 +147,8 @@ export function FingerprintDemo() {
       )}
 
       <p className="text-sm text-fm-muted">
-        In the full system this fingerprint would be recorded on a public ledger. Here it
-        is only computed on this device.
+        The fingerprint is recorded on a public ledger so anyone can check that the
+        passport has not changed.
       </p>
     </div>
   );

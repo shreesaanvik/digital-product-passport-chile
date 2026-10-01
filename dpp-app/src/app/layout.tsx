@@ -15,7 +15,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Fashion Mingle — Digital Product Passport",
+  title: "Fashion Mingle: Digital Product Passport",
   description:
     "Trace heritage crafts from loom to label. Simple tools for artisans, stewards, and global partners.",
 };

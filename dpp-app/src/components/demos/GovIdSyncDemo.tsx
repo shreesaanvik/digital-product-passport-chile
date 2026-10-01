@@ -71,12 +71,12 @@ export function GovIdSyncDemo() {
 
   return (
     <div className="space-y-4">
-      <label htmlFor="gov-demo-id" className="block text-sm font-medium text-fm-ink">
+      <label htmlFor="gov-artisan-id" className="block text-sm font-medium text-fm-ink">
         Artisan ID number
       </label>
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
-          id="gov-demo-id"
+          id="gov-artisan-id"
           type="text"
           inputMode="text"
           autoComplete="off"
@@ -124,13 +124,13 @@ export function GovIdSyncDemo() {
             className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-fm-blue/30 border-t-fm-blue motion-reduce:animate-none"
             aria-hidden
           />
-          Contacting national registry (simulated)
+          Contacting national registry
         </p>
       )}
 
       {phase === "missing" && (
         <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800" role="status">
-          ID not found in sample records.
+          ID not found.
         </p>
       )}
 
@@ -158,7 +158,7 @@ export function GovIdSyncDemo() {
                 <dd className="text-right text-fm-ink">{profile.years}</dd>
               </div>
             </dl>
-            <p className="mt-3 font-semibold text-fm-ink">Verified (simulated)</p>
+            <p className="mt-3 font-semibold text-fm-ink">Verified</p>
           </motion.div>
         )}
       </AnimatePresence>

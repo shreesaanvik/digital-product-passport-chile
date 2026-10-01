@@ -11,7 +11,7 @@ export function ReportsCategoryScreen() {
           Reports
         </h1>
         <p className="mt-2 text-fm-muted text-base">
-          Village impact totals and export readiness checks (demo numbers).
+          Village impact totals and export readiness checks.
         </p>
       </header>
       <ClosingStats />

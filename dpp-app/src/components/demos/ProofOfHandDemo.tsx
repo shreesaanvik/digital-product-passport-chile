@@ -36,7 +36,7 @@ export function ProofOfHandDemo() {
             {recordedAt ? (
               <Image
                 src={HERO_IMAGE}
-                alt="Artisan at a weaving loom, sample proof photo"
+                alt="Artisan at a weaving loom"
                 fill
                 sizes="280px"
                 className="object-cover"

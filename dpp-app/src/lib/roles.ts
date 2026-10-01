@@ -78,7 +78,7 @@ export const EXPLORE_CARDS: { role: Role; title: string; line: string }[] = [
   {
     role: "government",
     title: "Government body",
-    line: "Check what is live and inspect passport data",
+    line: "Review features and inspect passport data",
   },
 ];
 
@@ -100,7 +100,7 @@ export const BOTTOM_TABS: Record<Role, BottomTab[]> = {
   government: [
     { id: "clusters", label: "Clusters", icon: "◎" },
     { id: "passport", label: "Passport", icon: "▣" },
-    { id: "whats-live", label: "What's live", icon: "●" },
+    { id: "whats-live", label: "Features", icon: "●" },
   ],
 };
 

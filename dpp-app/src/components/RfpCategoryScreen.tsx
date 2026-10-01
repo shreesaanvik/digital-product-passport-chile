@@ -86,7 +86,7 @@ function LogisticsCostCalculator() {
           Village-to-Doorstep Logistics
         </h3>
         <p className="mt-1 text-sm text-fm-muted">
-          Varanasi, India → New York, USA · 5.0 kg textile box (demo)
+          Varanasi, India → New York, USA · 5.0 kg textile box
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-fm-btn-light/60 px-4 py-3 border border-fm-blue/15">
@@ -160,12 +160,18 @@ function LogisticsCostCalculator() {
   );
 }
 
+const REQUESTS = [
+  { id: "1", title: "Temple silk · Kanchipuram", status: "Open", closes: "Apr 28" },
+  { id: "2", title: "Ajrakh yardage · Kutch", status: "Reviewing", closes: "May 2" },
+  { id: "3", title: "Bandhani scarves · Jaipur", status: "Open", closes: "May 10" },
+] as const;
+
 export function RfpCategoryScreen() {
-  const demos = [
-    { id: "1", title: "Temple silk · Kanchipuram", status: "Open", closes: "Apr 28" },
-    { id: "2", title: "Ajrakh yardage · Kutch", status: "Reviewing", closes: "May 2" },
-    { id: "3", title: "Bandhani scarves · Jaipur", status: "Open", closes: "May 10" },
-  ] as const;
+  const [query, setQuery] = useState("");
+  const needle = query.trim().toLowerCase();
+  const requests = REQUESTS.filter((request) =>
+    request.title.toLowerCase().includes(needle),
+  );
 
   return (
     <div className="space-y-6">
@@ -174,7 +180,7 @@ export function RfpCategoryScreen() {
           RFPs &amp; direct sourcing
         </h1>
         <p className="mt-2 text-fm-muted text-base">
-          Post and browse sourcing requests. This demo shows the layout only.
+          Post and browse sourcing requests.
         </p>
       </header>
 
@@ -192,13 +198,10 @@ export function RfpCategoryScreen() {
           id="cluster-search-rfp"
           type="search"
           placeholder="Search skill, cluster, or GI tag…"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
           className="w-full min-h-[52px] rounded-xl border-2 border-slate-200 px-4 text-lg placeholder:text-slate-400 focus:border-fm-blue focus:outline-none"
-          readOnly
-          aria-describedby="search-hint-rfp"
         />
-        <p id="search-hint-rfp" className="text-sm text-fm-muted mt-2">
-          Full search connects in the live product. This screen is a guided demo.
-        </p>
       </section>
 
       <section aria-labelledby="open-rfp-heading">
@@ -206,30 +209,34 @@ export function RfpCategoryScreen() {
           id="open-rfp-heading"
           className="font-display text-lg font-semibold text-fm-blue mb-3"
         >
-          Open requests (demo)
+          Open requests
         </h2>
-        <ul className="flex flex-col gap-3">
-          {demos.map((r) => (
-            <li
-              key={r.id}
-              className="rounded-2xl border border-slate-100 bg-white p-4 shadow-neu"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <p className="font-display font-semibold text-fm-ink">{r.title}</p>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                    r.status === "Open"
-                      ? "bg-fm-green-soft text-fm-green"
-                      : "bg-fm-orange-soft text-fm-orange"
-                  }`}
-                >
-                  {r.status}
-                </span>
-              </div>
-              <p className="mt-2 text-sm text-fm-muted">Closes {r.closes} (demo)</p>
-            </li>
-          ))}
-        </ul>
+        {requests.length === 0 ? (
+          <p className="text-sm text-fm-muted">No requests match</p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {requests.map((r) => (
+              <li
+                key={r.id}
+                className="rounded-2xl border border-slate-100 bg-white p-4 shadow-neu"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-display font-semibold text-fm-ink">{r.title}</p>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      r.status === "Open"
+                        ? "bg-fm-green-soft text-fm-green"
+                        : "bg-fm-orange-soft text-fm-orange"
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-fm-muted">Closes {r.closes}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <LogisticsCostCalculator />

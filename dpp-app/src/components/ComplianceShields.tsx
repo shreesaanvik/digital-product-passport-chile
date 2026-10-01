@@ -17,7 +17,7 @@ export function ComplianceShields() {
         Export checks
       </h2>
       <p className="text-fm-muted text-base mb-4">
-        Simple green checks for regulators. Tap nothing — just read.
+        Simple green checks for regulators. Tap nothing. Just read.
       </p>
       <ul className="flex flex-col gap-3">
         {ITEMS.map((item) => (

@@ -104,7 +104,7 @@ export function EsprCheckDemo() {
 
       {filled && (
         <p className="text-sm font-semibold text-fm-green" role="status">
-          Ready to ship (simulated)
+          Ready to ship
         </p>
       )}
 

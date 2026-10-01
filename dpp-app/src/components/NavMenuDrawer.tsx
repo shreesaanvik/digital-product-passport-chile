@@ -17,7 +17,7 @@ const ITEMS: { id: "switch-role" | MenuScreen; title: string }[] = [
   { id: "switch-role", title: "Switch role" },
   { id: "story", title: "Artisan's story" },
   { id: "pay", title: "Pay" },
-  { id: "whats-live", title: "What's live" },
+  { id: "whats-live", title: "Features" },
 ];
 
 export function NavMenuDrawer({
