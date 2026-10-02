@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
 import L from "leaflet";
 import {
   CircleMarker,
@@ -150,8 +151,24 @@ export function IndiaMap({ selectedId, onSelect, matchedIds = null }: Props) {
                   click: () => onSelect(c.id),
                 }}
               >
-                <Tooltip direction="top" offset={[0, -8]} opacity={0.92}>
-                  {c.name}, {c.craft}
+                <Tooltip
+                  direction="top"
+                  offset={[0, -8]}
+                  opacity={1}
+                  className="fm-cluster-tooltip"
+                >
+                  <span className="block w-40">
+                    <Image
+                      src={c.image}
+                      alt={c.imageAlt}
+                      width={160}
+                      height={80}
+                      className="h-20 w-40 rounded object-cover"
+                    />
+                    <span className="mt-1 block text-center text-xs leading-snug">
+                      {c.name}, {c.craft}
+                    </span>
+                  </span>
                 </Tooltip>
               </CircleMarker>
             </Fragment>

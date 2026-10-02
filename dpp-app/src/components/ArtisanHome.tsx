@@ -6,12 +6,13 @@ import {
   ARTISAN,
   artisanPaymentStatus,
   artisanPaymentTotals,
+  clusterById,
   formatInr,
 } from "@/lib/data";
+import { BackLink } from "./BackLink";
 import { PassportPanel } from "./PassportPanel";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
+const KUTCH_PATTERN = clusterById("kutch");
 
 const largeButtonClass =
   "btn-primary flex w-full min-h-[56px] items-center justify-center text-lg font-semibold";
@@ -39,7 +40,6 @@ export function ArtisanHome({ panel, onPanel }: Props) {
   if (panel === "steward") return <StewardDetail onBack={back} />;
 
   const firstName = ARTISAN.name.split(" ")[0];
-  const stage = ARTISAN.stages[ARTISAN.currentStage];
 
   return (
     <div className="text-lg text-fm-ink">
@@ -61,9 +61,7 @@ export function ArtisanHome({ panel, onPanel }: Props) {
           </button>
         ))}
       </div>
-      <p className="mt-4 text-lg font-semibold leading-snug text-fm-ink" role="status">
-        Your order is at: {stage}
-      </p>
+      <OrderProgress onOpen={() => onPanel("work")} />
     </div>
   );
 }
@@ -82,8 +80,8 @@ export function ArtisanHero({
   return (
     <div className="relative h-64 w-full overflow-hidden rounded-2xl">
       <Image
-        src={HERO_IMAGE}
-        alt=""
+        src={KUTCH_PATTERN.image}
+        alt={KUTCH_PATTERN.imageAlt}
         fill
         sizes="(max-width: 512px) 100vw, 512px"
         className="object-cover object-center"
@@ -162,12 +160,108 @@ function DetailShell({
 }) {
   return (
     <div className="text-lg text-fm-ink">
-      <button type="button" onClick={onBack} className={largeButtonClass}>
-        Back
-      </button>
-      <h1 className="mt-4 font-display text-2xl font-semibold text-fm-ink">{title}</h1>
+      <BackLink onClick={onBack} />
+      <h1 className="mt-2 font-display text-2xl font-semibold text-fm-ink">{title}</h1>
       <div className="mt-4">{children}</div>
     </div>
+  );
+}
+
+function OrderProgress({ onOpen }: { onOpen: () => void }) {
+  const current = ARTISAN.currentStage;
+  const last = ARTISAN.stages.length - 1;
+
+  return (
+    <section className="mt-4" aria-labelledby="artisan-order-heading">
+      <h2 id="artisan-order-heading" className="text-lg font-semibold text-fm-ink">
+        Your order
+      </h2>
+      <div className="relative mt-3 w-[calc(100%+2rem)] -mx-4">
+        <ol className="grid w-full grid-cols-5">
+          {ARTISAN.stages.map((stage, index) => {
+            const state = index < current ? "done" : index === current ? "now" : "later";
+            return (
+              <li
+                key={stage}
+                className="flex min-w-0 flex-col items-center"
+                aria-current={state === "now" ? "step" : undefined}
+              >
+                <div className="flex h-4 items-end justify-center">
+                  {state === "now" ? (
+                    <span className="text-[12px] font-semibold leading-none text-fm-blue" aria-hidden>
+                      Now
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex h-2 items-start justify-center" aria-hidden>
+                  {state === "now" ? (
+                    <svg viewBox="0 0 10 6" className="h-1.5 w-2.5 text-fm-blue">
+                      <path d="M0 0 L5 6 L10 0 Z" fill="currentColor" />
+                    </svg>
+                  ) : null}
+                </div>
+                <div className="relative flex h-6 w-full items-center justify-center">
+                  {index > 0 ? (
+                    <span
+                      className="absolute inset-y-0 left-0 right-1/2 z-0 my-auto h-0.5 bg-slate-300"
+                      aria-hidden
+                    />
+                  ) : null}
+                  {index < last ? (
+                    <span
+                      className="absolute inset-y-0 left-1/2 right-0 z-0 my-auto h-0.5 bg-slate-300"
+                      aria-hidden
+                    />
+                  ) : null}
+                  <ProgressDot state={state} />
+                </div>
+                <p
+                  className={`mt-1 w-full text-center text-[14px] leading-tight tracking-tighter ${
+                    state === "later" ? "text-slate-500" : "text-fm-ink"
+                  }`}
+                >
+                  <span className="sr-only">
+                    {state === "done" ? "Done. " : state === "now" ? "Now. " : "Later. "}
+                  </span>
+                  {stage}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+        <button
+          type="button"
+          onClick={onOpen}
+          className="absolute inset-0"
+          aria-label="Open My work"
+        />
+      </div>
+    </section>
+  );
+}
+
+function ProgressDot({ state }: { state: "done" | "now" | "later" }) {
+  const size = state === "now" ? "h-6 w-6" : state === "done" ? "h-4 w-4" : "h-3 w-3";
+  const color =
+    state === "now" ? "bg-fm-blue" : state === "done" ? "bg-fm-green" : "bg-slate-300";
+
+  return (
+    <span
+      className={`relative z-10 flex shrink-0 items-center justify-center rounded-full ${size} ${color}`}
+      aria-hidden
+    >
+      {state === "done" ? (
+        <svg viewBox="0 0 12 12" className="h-2.5 w-2.5 text-white" fill="none">
+          <path
+            d="M2.5 6.2 5 8.5 9.5 3.5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ) : null}
+    </span>
   );
 }
 

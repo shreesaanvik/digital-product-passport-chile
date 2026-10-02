@@ -158,6 +158,11 @@ body {
   pointer-events: none;
 }
 
+.leaflet-tooltip.fm-cluster-tooltip {
+  white-space: normal;
+  padding: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-map-pin--active,
   .fm-map-pin--idle,

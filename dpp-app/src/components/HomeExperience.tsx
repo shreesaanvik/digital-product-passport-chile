@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppHeader } from "./AppHeader";
@@ -129,16 +130,27 @@ export function HomeExperience() {
             <IndiaMap selectedId={clusterId} onSelect={setClusterId} />
             {cluster && (
               <div
-                className="mt-4 rounded-2xl bg-white p-4 shadow-neu border border-slate-100"
+                className="mt-4 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-neu"
                 role="region"
                 aria-live="polite"
               >
-                <p className="font-display text-xl font-semibold text-fm-ink">{cluster.name}</p>
-                <p className="text-fm-muted">{cluster.craft}</p>
-                <p className="mt-2 text-fm-ink">
-                  <strong>{cluster.orders}</strong> active orders ·{" "}
-                  <strong>{cluster.artisans}</strong> artisans
-                </p>
+                <div className="relative h-[120px] w-full">
+                  <Image
+                    src={cluster.image}
+                    alt={cluster.imageAlt}
+                    fill
+                    sizes="(max-width: 512px) 100vw, 512px"
+                    className="rounded-t-2xl object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <p className="font-display text-xl font-semibold text-fm-ink">{cluster.name}</p>
+                  <p className="text-fm-muted">{cluster.craft}</p>
+                  <p className="mt-2 text-fm-ink">
+                    <strong>{cluster.orders}</strong> active orders ·{" "}
+                    <strong>{cluster.artisans}</strong> artisans
+                  </p>
+                </div>
               </div>
             )}
             <button

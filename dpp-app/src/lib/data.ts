@@ -13,6 +13,8 @@ export const CLUSTERS = [
     y: 42,
     lat: 25.3176,
     lng: 82.9739,
+    image: "/clusters/varanasi.jpg",
+    imageAlt: "Banarasi zari brocade pattern, Varanasi",
   },
   {
     id: "kutch",
@@ -24,6 +26,8 @@ export const CLUSTERS = [
     y: 58,
     lat: 23.242,
     lng: 69.6669,
+    image: "/clusters/kutch.jpg",
+    imageAlt: "Ajrakh block-print pattern, Kutch",
   },
   {
     id: "kanchi",
@@ -35,6 +39,8 @@ export const CLUSTERS = [
     y: 88,
     lat: 12.8342,
     lng: 79.7036,
+    image: "/clusters/kanchipuram.jpg",
+    imageAlt: "Kanchipuram temple silk pattern",
   },
   {
     id: "jaipur",
@@ -46,6 +52,8 @@ export const CLUSTERS = [
     y: 48,
     lat: 26.9124,
     lng: 75.7873,
+    image: "/clusters/jaipur.jpg",
+    imageAlt: "Bandhani tie-dye pattern, Jaipur",
   },
   {
     id: "murshidabad",
@@ -57,8 +65,15 @@ export const CLUSTERS = [
     y: 52,
     lat: 24.1839,
     lng: 88.2717,
+    image: "/clusters/murshidabad.jpg",
+    imageAlt: "Murshidabad printed silk pattern",
   },
 ] as const;
+
+export const BHUJODI_PATTERN = {
+  image: "/clusters/bhujodi.jpg",
+  imageAlt: "Bhujodi handloom weave pattern",
+} as const;
 
 export type ClusterId = (typeof CLUSTERS)[number]["id"];
 

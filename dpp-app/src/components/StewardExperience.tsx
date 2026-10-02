@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   ARTISAN,
+  clusterById,
   EVIDENCE_GPS,
   EVIDENCE_LOG,
   ROSTER,
@@ -13,13 +14,13 @@ import {
   type RosterStatus,
   type StewardConsent,
 } from "@/lib/data";
+import { BackLink } from "./BackLink";
 import { PassportPanel } from "./PassportPanel";
 import { DemoSheet } from "./demos/DemoSheet";
 import { GovIdSyncDemo, type VerifiedGovId } from "./demos/GovIdSyncDemo";
 import { ProofOfHandDemo } from "./demos/ProofOfHandDemo";
 
-const PASSPORT_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
+const KUTCH_PATTERN = clusterById("kutch");
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -381,13 +382,7 @@ function ArtisanDetail({
 }) {
   return (
     <div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="min-h-[44px] text-base font-semibold text-fm-btn-text"
-      >
-        Back
-      </button>
+      <BackLink onClick={onBack} />
       <div className="mt-2 flex items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold text-fm-ink">{artisan.name}</h1>
@@ -448,8 +443,8 @@ function ArtisanDetail({
                 className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-neu"
               >
                 <Image
-                  src={PASSPORT_HERO_IMAGE}
-                  alt=""
+                  src={KUTCH_PATTERN.image}
+                  alt={KUTCH_PATTERN.imageAlt}
                   width={64}
                   height={64}
                   className="h-16 w-16 shrink-0 rounded-lg object-cover"

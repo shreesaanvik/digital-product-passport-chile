@@ -3,10 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { CLUSTER_PASSPORTS, stageIndex } from "@/lib/data";
+import { CLUSTER_PASSPORTS, clusterById, stageIndex } from "@/lib/data";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
+const KUTCH_PATTERN = clusterById("kutch");
 
 const KUTCH_PASSPORT = CLUSTER_PASSPORTS.kutch;
 const PRIOR_STEPS = KUTCH_PASSPORT.stages.slice(
@@ -44,8 +43,8 @@ export function ProofOfHandDemo({ onRecorded }: ProofOfHandDemoProps = {}) {
           <div className="relative aspect-[3/4] w-full bg-slate-200">
             {recordedAt ? (
               <Image
-                src={HERO_IMAGE}
-                alt="Artisan at a weaving loom"
+                src={KUTCH_PATTERN.image}
+                alt={KUTCH_PATTERN.imageAlt}
                 fill
                 sizes="280px"
                 className="object-cover"

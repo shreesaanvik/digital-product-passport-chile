@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  BHUJODI_PATTERN,
   CLUSTER_PASSPORTS,
   clusterById,
   passportJsonLd,
@@ -11,9 +12,6 @@ import {
   stageIndex,
   type ClusterId,
 } from "@/lib/data";
-
-const ARTISAN_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
 
 const BADGES = [
   { label: "Hand-woven", icon: "◇" },
@@ -57,6 +55,7 @@ export function PassportPanel({
   const passport = CLUSTER_PASSPORTS[clusterId];
   const title = heritageName ?? cluster.name;
   const craft = heritageCraft ?? cluster.craft;
+  const hero = pooled ? BHUJODI_PATTERN : cluster;
   const stages = pooled ? POOLED_PASSPORT.stages : passport.stages;
   const currentName = pooled ? POOLED_PASSPORT.currentStage : passport.currentStage;
   const currentIndex = stageIndex(stages, currentName);
@@ -117,8 +116,8 @@ export function PassportPanel({
       <div className="-mx-5 mb-4">
         <div className="relative h-[200px] w-full overflow-hidden">
           <Image
-            src={ARTISAN_HERO_IMAGE}
-            alt={`Artisan at a weaving loom, ${title}, ${craft}`}
+            src={hero.image}
+            alt={hero.imageAlt}
             fill
             sizes="(max-width: 512px) 100vw, 512px"
             className="object-cover object-center scale-105"
