@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { clusterById, ROSTER } from "@/lib/data";
+
+const lalita = ROSTER.find((artisan) => artisan.id === "KUT-4410");
 
 const SAMPLE_RECORDS = {
   "KUT-4410": {
-    name: "Fatima Khatri",
-    craft: "Ajrakh Block-Print",
-    cluster: "Kutch",
+    name: lalita?.name ?? "Lalita Rabari",
+    craft: lalita?.craft ?? "Ajrakh block-print",
+    cluster: clusterById("kutch").name,
     years: 18,
   },
   "VAR-9982": {

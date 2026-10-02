@@ -280,7 +280,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
             Back
           </button>
           <div className="mt-4">
-            <PassportPanel heritageName="Kutch" heritageCraft="Ajrakh block-print" />
+            <PassportPanel clusterId="kutch" />
           </div>
         </div>
       )}

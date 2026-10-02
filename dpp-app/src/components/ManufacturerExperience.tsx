@@ -400,10 +400,12 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
           </select>
           <div className="mt-4">
             <PassportPanel
+              clusterId="kutch"
               heritageName="Kutch"
               heritageCraft="Bhujodi handloom weaving"
               pieceLine={pieceSummary(selected)}
               technicalExtra={technicalFor(selected, materials)}
+              pooled
             />
           </div>
         </div>

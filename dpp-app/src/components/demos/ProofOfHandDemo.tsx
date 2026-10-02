@@ -3,11 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { CLUSTER_PASSPORTS, stageIndex } from "@/lib/data";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
 
-const PRIOR_STEPS = ["Loom setup", "Weaving", "Quality check"] as const;
+const KUTCH_PASSPORT = CLUSTER_PASSPORTS.kutch;
+const PRIOR_STEPS = KUTCH_PASSPORT.stages.slice(
+  0,
+  stageIndex(KUTCH_PASSPORT.stages, KUTCH_PASSPORT.currentStage),
+);
 const STAMP_PLACE = "23.24 N, 69.67 E (Kutch)";
 const STAMP_BY = "Recorded by Priya Chauhan, Steward";
 

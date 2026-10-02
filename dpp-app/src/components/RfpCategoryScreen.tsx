@@ -1,46 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-const BASE_COSTS = {
-  artisanPayout: 450,
-  shipping: 42.5,
-  duty: 31,
-  platformFee: 15,
-} as const;
-
-function formatUsd(amount: number) {
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-type LineItem = {
-  label: string;
-  amount: number;
-  note: string;
-  prominent?: boolean;
-};
+import { formatUsd, LANDED_COST_LINES, MAIN_ORDER } from "@/lib/data";
 
 function LogisticsCostCalculator() {
   const [quantity, setQuantity] = useState(1);
   const [locked, setLocked] = useState(false);
 
-  const costs = useMemo(
-    () => ({
-      artisanPayout: BASE_COSTS.artisanPayout * quantity,
-      shipping: BASE_COSTS.shipping * quantity,
-      duty: BASE_COSTS.duty * quantity,
-      platformFee: BASE_COSTS.platformFee * quantity,
-    }),
+  const lineItems = useMemo(
+    () =>
+      LANDED_COST_LINES.map((line) => ({
+        ...line,
+        amount: line.amount * quantity,
+      })),
     [quantity],
   );
 
-  const total =
-    costs.artisanPayout + costs.shipping + costs.duty + costs.platformFee;
+  const total = lineItems.reduce((sum, line) => sum + line.amount, 0);
 
   function handleQuantityChange(raw: string) {
     setLocked(false);
@@ -48,30 +24,6 @@ function LogisticsCostCalculator() {
     if (Number.isNaN(parsed)) return;
     setQuantity(Math.min(10, Math.max(1, parsed)));
   }
-
-  const lineItems: LineItem[] = [
-    {
-      label: "Direct Artisan Payout",
-      amount: costs.artisanPayout,
-      note: "100% to cluster artisans",
-      prominent: true,
-    },
-    {
-      label: "Eco-Express Shipping",
-      amount: costs.shipping,
-      note: "Negotiated DHL / India Post rate",
-    },
-    {
-      label: "Estimated Import Duty",
-      amount: costs.duty,
-      note: "HTS 5007.20 (Silk)",
-    },
-    {
-      label: "Platform Service Fee",
-      amount: costs.platformFee,
-      note: "Connects supply & compliance",
-    },
-  ];
 
   return (
     <section aria-labelledby="logistics-calculator-heading">
@@ -86,7 +38,7 @@ function LogisticsCostCalculator() {
           Village-to-Doorstep Logistics
         </h3>
         <p className="mt-1 text-sm text-fm-muted">
-          Varanasi, India → New York, USA · 5.0 kg textile box
+          {MAIN_ORDER.routeFrom} to {MAIN_ORDER.routeTo}
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-fm-btn-light/60 px-4 py-3 border border-fm-blue/15">
@@ -139,7 +91,7 @@ function LogisticsCostCalculator() {
         </ul>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-fm-surface px-4 py-3 border border-slate-200">
-          <p className="font-display font-semibold text-fm-ink">Total Landed Cost</p>
+          <p className="font-display font-semibold text-fm-ink">Total landed cost</p>
           <p className="font-display text-xl font-bold text-fm-blue tabular-nums">
             {formatUsd(total)}
           </p>

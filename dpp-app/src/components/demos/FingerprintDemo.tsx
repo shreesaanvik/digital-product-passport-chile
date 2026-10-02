@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CLUSTER_PASSPORTS } from "@/lib/data";
+
+const KUTCH_PASSPORT = CLUSTER_PASSPORTS.kutch;
 
 const DEFAULT_FIELDS = {
-  product: "Hand-loomed Silk Saree",
-  material: "Mulberry silk, zari (tested)",
-  origin: "Varanasi, India",
-  artisan: "Lata Devi",
+  product: KUTCH_PASSPORT.product,
+  material: KUTCH_PASSPORT.material,
+  origin: KUTCH_PASSPORT.origin_geo,
+  artisan: KUTCH_PASSPORT.artisan,
 };
 
 type FieldKey = keyof typeof DEFAULT_FIELDS;

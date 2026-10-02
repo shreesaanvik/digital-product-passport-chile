@@ -163,8 +163,7 @@ export function HomeExperience() {
 
         {activeScreen === "passport" && role !== "manufacturer" && (
           <PassportPanel
-            heritageName={cluster?.name ?? "Kutch"}
-            heritageCraft={cluster?.craft ?? "Ajrakh Block-Print"}
+            clusterId={cluster?.id ?? "kutch"}
             defaultShowTech={role === "government"}
           />
         )}
@@ -181,6 +180,7 @@ export function HomeExperience() {
                 setScreen("home");
                 return;
               }
+              setClusterId("kutch");
               setScreen(role === "steward" ? "passports" : "passport");
             }}
           />

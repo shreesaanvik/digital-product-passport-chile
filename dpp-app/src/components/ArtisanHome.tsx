@@ -240,7 +240,7 @@ function PassportDetail({ onBack }: { onBack: () => void }) {
       </button>
       {showFull && (
         <div className="mt-4">
-          <PassportPanel heritageName="Kutch" heritageCraft="Ajrakh block-print" />
+          <PassportPanel clusterId="kutch" />
         </div>
       )}
     </DetailShell>

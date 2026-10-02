@@ -6,6 +6,8 @@ import { ESPR_SAMPLE_FIELDS } from "./esprFields";
 
 type RowState = "pending" | "present" | "missing";
 
+const MISSING_COUNT = ESPR_SAMPLE_FIELDS.filter((field) => !field.present).length;
+
 export function EsprCheckDemo() {
   const [running, setRunning] = useState(false);
   const [revealed, setRevealed] = useState(0);
@@ -88,7 +90,9 @@ export function EsprCheckDemo() {
 
       {finished && !filled && (
         <p className="text-sm font-semibold text-red-700" role="status">
-          2 required fields missing. Product would be held before shipping.
+          {MISSING_COUNT === 1
+            ? "1 required field missing. Product would be held before shipping."
+            : `${MISSING_COUNT} required fields missing. Product would be held before shipping.`}
         </p>
       )}
 

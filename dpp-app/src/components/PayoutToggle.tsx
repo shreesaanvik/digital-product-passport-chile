@@ -2,25 +2,32 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { DEMO_ORDER } from "@/lib/data";
+import {
+  ARTISAN,
+  clusterById,
+  formatInr,
+  formatUsd,
+  inrFromUsd,
+  MAIN_ORDER,
+  MINGLE_PAYOUT_SHARES,
+  OLD_PAYOUT_SHARES,
+} from "@/lib/data";
 
-const TRADITIONAL = [
-  { label: "Brand pays", pct: 100, color: "bg-slate-400" },
-  { label: "Exporter", pct: 40, color: "bg-slate-500" },
-  { label: "Middleman", pct: 30, color: "bg-fm-pink/80" },
-  { label: "Artisan", pct: 15, color: "bg-fm-orange" },
-];
-
-const MINGLE = [
-  { label: "Brand pays", pct: 100, color: "bg-slate-400" },
-  { label: "Platform fee", pct: 5, color: "bg-fm-btn-bg" },
-  { label: "Logistics", pct: 15, color: "bg-fm-purple/70" },
-  { label: "Artisan", pct: 80, color: "bg-fm-green" },
-];
+function barColor(label: string, mode: "old" | "new") {
+  if (label === "Artisan") return mode === "new" ? "bg-fm-green" : "bg-fm-orange";
+  if (label === "Exporter") return "bg-slate-500";
+  if (label === "Middlemen") return "bg-fm-pink/80";
+  if (label === "Other costs") return "bg-slate-400";
+  if (label === "Platform fee") return "bg-fm-btn-bg";
+  if (label === "Logistics") return "bg-fm-purple/70";
+  return "bg-slate-400";
+}
 
 export function PayoutToggle() {
   const [mode, setMode] = useState<"old" | "new">("new");
-  const rows = mode === "old" ? TRADITIONAL : MINGLE;
+  const rows = mode === "old" ? OLD_PAYOUT_SHARES : MINGLE_PAYOUT_SHARES;
+  const artisanUsd = MAIN_ORDER.split.artisan.usd;
+  const clusterName = clusterById("kutch").name;
 
   return (
     <section
@@ -63,6 +70,10 @@ export function PayoutToggle() {
         </button>
       </div>
 
+      <p className="mb-3 font-semibold text-fm-ink">
+        Buyer pays {formatUsd(MAIN_ORDER.buyerPays)}
+      </p>
+
       <div className="space-y-3" role="list">
         {rows.map((row) => (
           <div key={row.label} className="flex items-center gap-3">
@@ -70,9 +81,9 @@ export function PayoutToggle() {
             <div className="flex-1 h-10 rounded-lg bg-slate-100 overflow-hidden">
               <motion.div
                 layout
-                className={`h-full ${row.color} rounded-lg`}
+                className={`h-full ${barColor(row.label, mode)} rounded-lg`}
                 initial={false}
-                animate={{ width: `${row.pct}%` }}
+                animate={{ width: `${row.share}%` }}
                 transition={{ type: "spring", stiffness: 120, damping: 20 }}
                 style={{
                   boxShadow:
@@ -83,7 +94,7 @@ export function PayoutToggle() {
               />
             </div>
             <span className="w-12 text-right font-mono text-sm text-fm-muted">
-              {row.pct}%
+              {row.share}%
             </span>
           </div>
         ))}
@@ -92,10 +103,7 @@ export function PayoutToggle() {
       <div className="mt-6 rounded-xl bg-fm-surface p-4 border border-slate-200">
         <p className="text-sm text-fm-muted mb-1">Sample order</p>
         <p className="text-fm-ink">
-          <strong>{DEMO_ORDER.artisan}</strong> · {DEMO_ORDER.village}
-        </p>
-        <p className="text-fm-green font-semibold mt-2">
-          Artisan payout this order: ${DEMO_ORDER.artisan_payout.toFixed(2)}
+          {`${ARTISAN.name}, ${clusterName}. Artisan receives ${formatUsd(artisanUsd)} (${formatInr(inrFromUsd(artisanUsd))}) on this order.`}
         </p>
       </div>
     </section>

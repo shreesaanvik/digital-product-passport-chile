@@ -1,35 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { formatInr, formatUsd, inrFromUsd, MAIN_ORDER } from "@/lib/data";
 
-const DEPOSIT = 500;
-const FIRST_PAYMENT = 150;
-const SECOND_PAYMENT = 175;
-const FINAL_PAYMENT = 175;
+const ARTISAN_USD = MAIN_ORDER.split.artisan.usd;
+const OTHER_USD = MAIN_ORDER.buyerPays - ARTISAN_USD;
 
 const STEPS = [
   {
-    label: "Buyer deposits $500 into escrow",
+    label: `Buyer pays ${formatUsd(MAIN_ORDER.buyerPays)}. ${formatUsd(ARTISAN_USD)} artisan share held in escrow, ${formatUsd(OTHER_USD)} covers logistics and platform fee.`,
     paid: 0,
   },
-  {
-    label: "Steward verifies loom setup, first payment of $150 released to artisan",
-    paid: FIRST_PAYMENT,
-  },
-  {
-    label: "Quality check passed, second payment of $175 released",
-    paid: FIRST_PAYMENT + SECOND_PAYMENT,
-  },
-  {
-    label: "Shipped, final payment of $175 released",
-    paid: FIRST_PAYMENT + SECOND_PAYMENT + FINAL_PAYMENT,
-  },
-] as const;
+  ...MAIN_ORDER.milestones.map((milestone, index) => {
+    const paid = MAIN_ORDER.milestones
+      .slice(0, index + 1)
+      .reduce((sum, item) => sum + item.usd, 0);
+    return {
+      label: `${milestone.release}, ${formatUsd(milestone.usd)} (${formatInr(inrFromUsd(milestone.usd))}) released`,
+      paid,
+    };
+  }),
+];
 
 export function EscrowPayoutsDemo() {
   const [step, setStep] = useState(0);
   const current = STEPS[step] ?? STEPS[0];
-  const held = DEPOSIT - current.paid;
+  const held = ARTISAN_USD - current.paid;
   const atEnd = step >= STEPS.length - 1;
 
   return (
@@ -61,10 +57,10 @@ export function EscrowPayoutsDemo() {
 
       <p className="flex flex-wrap gap-x-4 gap-y-1 rounded-xl bg-fm-surface px-4 py-3 text-fm-ink" aria-live="polite">
         <span>
-          Held in escrow: <strong>${held}</strong>
+          Held in escrow: <strong>{formatUsd(held)}</strong>
         </span>
         <span>
-          Paid to artisan: <strong>${current.paid}</strong>
+          Paid to artisan: <strong>{formatUsd(current.paid)}</strong>
         </span>
       </p>
 

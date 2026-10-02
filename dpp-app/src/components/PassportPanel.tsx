@@ -3,17 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { PASSPORT_JSON_LD } from "@/lib/data";
+import {
+  CLUSTER_PASSPORTS,
+  clusterById,
+  passportJsonLd,
+  POOLED_PASSPORT,
+  stageIndex,
+  type ClusterId,
+} from "@/lib/data";
 
 const ARTISAN_HERO_IMAGE =
   "https://images.unsplash.com/photo-1638310533874-6c124c012e1d?auto=format&fit=crop&w=1400&q=85";
-
-const TIMELINE = [
-  { step: "Loom setup", status: "done" },
-  { step: "Weaving", status: "done" },
-  { step: "Quality check", status: "current" },
-  { step: "Ship to warehouse", status: "upcoming" },
-] as const;
 
 const BADGES = [
   { label: "Hand-woven", icon: "◇" },
@@ -34,24 +34,54 @@ export type PassportTechnicalExtra = {
 };
 
 type PassportPanelProps = {
-  heritageName: string;
-  heritageCraft: string;
+  clusterId: ClusterId;
+  heritageName?: string;
+  heritageCraft?: string;
   defaultShowTech?: boolean;
   pieceLine?: string;
   technicalExtra?: PassportTechnicalExtra;
+  pooled?: boolean;
 };
 
 export function PassportPanel({
+  clusterId,
   heritageName,
   heritageCraft,
   defaultShowTech = false,
   pieceLine,
   technicalExtra,
+  pooled = false,
 }: PassportPanelProps) {
   const [showTech, setShowTech] = useState(defaultShowTech);
-  const technicalJson = technicalExtra
-    ? { ...PASSPORT_JSON_LD, ...technicalExtra }
-    : PASSPORT_JSON_LD;
+  const cluster = clusterById(clusterId);
+  const passport = CLUSTER_PASSPORTS[clusterId];
+  const title = heritageName ?? cluster.name;
+  const craft = heritageCraft ?? cluster.craft;
+  const stages = pooled ? POOLED_PASSPORT.stages : passport.stages;
+  const currentName = pooled ? POOLED_PASSPORT.currentStage : passport.currentStage;
+  const currentIndex = stageIndex(stages, currentName);
+  const storyLine = pooled ? pieceLine : passport.artisan;
+  const technicalJson = pooled
+    ? {
+        ...passportJsonLd({
+          product: POOLED_PASSPORT.product,
+          material: technicalExtra
+            ? `${technicalExtra.materials.yarn}, ${technicalExtra.materials.dye}`
+            : POOLED_PASSPORT.material,
+          origin_geo: POOLED_PASSPORT.origin_geo,
+          stages: POOLED_PASSPORT.stages,
+          currentStage: POOLED_PASSPORT.currentStage,
+        }),
+        ...technicalExtra,
+      }
+    : passportJsonLd({
+        product: passport.product,
+        material: passport.material,
+        artisan: passport.artisan,
+        origin_geo: passport.origin_geo,
+        stages: passport.stages,
+        currentStage: passport.currentStage,
+      });
 
   return (
     <section
@@ -88,7 +118,7 @@ export function PassportPanel({
         <div className="relative h-[200px] w-full overflow-hidden">
           <Image
             src={ARTISAN_HERO_IMAGE}
-            alt={`Artisan at a weaving loom, ${heritageName}, ${heritageCraft}`}
+            alt={`Artisan at a weaving loom, ${title}, ${craft}`}
             fill
             sizes="(max-width: 512px) 100vw, 512px"
             className="object-cover object-center scale-105"
@@ -104,17 +134,17 @@ export function PassportPanel({
             </p>
             <div className="mt-2 h-px w-10 bg-fm-blue/80" aria-hidden />
             <p className="font-display text-[1.65rem] font-semibold leading-tight text-white mt-3 tracking-tight">
-              {heritageName}
+              {title}
             </p>
             <p className="text-base font-normal text-white/90 mt-1 tracking-wide">
-              {heritageCraft}
+              {craft}
             </p>
           </div>
         </div>
       </div>
 
-      {pieceLine ? (
-        <p className="mb-4 text-base leading-snug text-fm-ink">{pieceLine}</p>
+      {storyLine ? (
+        <p className="mb-4 text-base leading-snug text-fm-ink">{storyLine}</p>
       ) : null}
 
       <div className="flex flex-wrap gap-2 mb-4">
@@ -132,25 +162,28 @@ export function PassportPanel({
         Journey
       </h3>
       <ol className="space-y-2 mb-4">
-        {TIMELINE.map((t, i) => (
-          <li key={t.step} className="flex items-center gap-3 text-base">
-            <span
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                t.status === "done"
-                  ? "bg-fm-green text-white"
-                  : t.status === "current"
-                    ? "bg-fm-orange text-white"
-                    : "bg-slate-200 text-fm-muted"
-              }`}
-              aria-hidden
-            >
-              {i + 1}
-            </span>
-            <span className={t.status === "upcoming" ? "text-fm-muted" : "text-fm-ink"}>
-              {t.step}
-            </span>
-          </li>
-        ))}
+        {stages.map((step, i) => {
+          const status = i < currentIndex ? "done" : i === currentIndex ? "current" : "upcoming";
+          return (
+            <li key={step} className="flex items-center gap-3 text-base">
+              <span
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                  status === "done"
+                    ? "bg-fm-green text-white"
+                    : status === "current"
+                      ? "bg-fm-orange text-white"
+                      : "bg-slate-200 text-fm-muted"
+                }`}
+                aria-hidden
+              >
+                {i + 1}
+              </span>
+              <span className={status === "upcoming" ? "text-fm-muted" : "text-fm-ink"}>
+                {step}
+              </span>
+            </li>
+          );
+        })}
       </ol>
 
       <button
