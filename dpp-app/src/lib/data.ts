@@ -155,7 +155,7 @@ export const ROSTER: RosterArtisan[] = [
     village: "Bhujodi",
     status: "Needs visit",
     consent: { date: "20 Aug", language: "Gujarati" },
-    orderCode: null,
+    orderCode: "FM-KUT-2031",
   },
   {
     id: "KUT-4521",
@@ -176,6 +176,77 @@ export const ROSTER: RosterArtisan[] = [
     orderCode: null,
   },
 ];
+
+export const MANUFACTURER = {
+  name: "Devan Kapoor",
+  org: "Bhujodi Weavers Co-operative",
+  area: "Bhujodi, Kutch",
+} as const;
+
+export type PooledMaterials = {
+  yarn: string;
+  yarnSource: string;
+  dye: string;
+};
+
+export type PooledPiece = {
+  id: string;
+  makerId: string;
+  carton: "A" | "B";
+  wovenDate: string;
+  recordedBy: string;
+};
+
+const POOLED_MAKERS = [
+  { id: "KUT-4502", name: "Rekha Vankar", village: "Bhujodi", pieces: 10 },
+  { id: "KUT-4606", name: "Mavji Vankar", village: "Bhujodi", pieces: 8 },
+  { id: "KUT-4611", name: "Shamji Vankar", village: "Bhujodi", pieces: 8 },
+  { id: "KUT-4615", name: "Lakshmi Vankar", village: "Sarli", pieces: 7 },
+  { id: "KUT-4620", name: "Naran Vankar", village: "Sarli", pieces: 7 },
+] as const;
+
+function wovenDateForIndex(index: number): string {
+  const day = 1 + Math.round((index * 24) / 39);
+  return `${day} Sep`;
+}
+
+function buildPooledPieces(): PooledPiece[] {
+  const pieces: PooledPiece[] = [];
+  let number = 1;
+  for (const maker of POOLED_MAKERS) {
+    for (let count = 0; count < maker.pieces; count += 1) {
+      pieces.push({
+        id: `SH-${String(number).padStart(2, "0")}`,
+        makerId: maker.id,
+        carton: number <= 20 ? "A" : "B",
+        wovenDate: wovenDateForIndex(number - 1),
+        recordedBy: STEWARD.name,
+      });
+      number += 1;
+    }
+  }
+  return pieces;
+}
+
+export const POOLED_PIECES: PooledPiece[] = buildPooledPieces();
+
+export const POOLED_ORDER = {
+  code: "FM-KUT-2031",
+  product: "Handwoven wool shawl",
+  buyer: "Maren Voss studio",
+  totalPieces: 40,
+  stage: "Packed for shipping",
+  materials: {
+    yarn: "Merino wool",
+    yarnSource: "Spun locally in Kutch",
+    dye: "Natural indigo",
+  } satisfies PooledMaterials,
+  makers: POOLED_MAKERS,
+  cartons: [
+    { id: "Carton A", pieces: "SH-01 to SH-20" },
+    { id: "Carton B", pieces: "SH-21 to SH-40" },
+  ],
+} as const;
 
 export type EvidenceEntry = {
   stage: string;

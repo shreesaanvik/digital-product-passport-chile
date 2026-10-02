@@ -24,6 +24,7 @@ import { FeaturesScreen } from "./FeaturesScreen";
 import { ArtisanHome, type ArtisanPanel } from "./ArtisanHome";
 import { ArtisanStory } from "./ArtisanStory";
 import { StewardExperience } from "./StewardExperience";
+import { ManufacturerExperience } from "./ManufacturerExperience";
 
 const IndiaMap = dynamic(
   () => import("./IndiaMap").then((m) => m.IndiaMap),
@@ -155,7 +156,12 @@ export function HomeExperience() {
             <StewardExperience screen={activeScreen} />
           )}
 
-        {activeScreen === "passport" && (
+        {role === "manufacturer" &&
+          (activeScreen === "order" || activeScreen === "passport") && (
+            <ManufacturerExperience screen={activeScreen} onScreen={setScreen} />
+          )}
+
+        {activeScreen === "passport" && role !== "manufacturer" && (
           <PassportPanel
             heritageName={cluster?.name ?? "Kutch"}
             heritageCraft={cluster?.craft ?? "Ajrakh Block-Print"}
@@ -192,7 +198,7 @@ export function HomeExperience() {
           <ArtisanHome panel={artisanPanel} onPanel={setArtisanPanel} />
         )}
 
-        {(activeScreen === "order" ||
+        {((activeScreen === "order" && role !== "manufacturer") ||
           (activeScreen === "home" && role !== "artisan") ||
           (activeScreen === "artisans" && role !== "steward")) && <BuiltLater />}
       </main>

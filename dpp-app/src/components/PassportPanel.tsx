@@ -21,18 +21,37 @@ const BADGES = [
   { label: "Fair wage step", icon: "✓" },
 ];
 
+export type PassportTechnicalExtra = {
+  pieceId: string;
+  makerArtisanId: string;
+  orderCode: string;
+  carton: string;
+  materials: {
+    yarn: string;
+    yarnSource: string;
+    dye: string;
+  };
+};
+
 type PassportPanelProps = {
   heritageName: string;
   heritageCraft: string;
   defaultShowTech?: boolean;
+  pieceLine?: string;
+  technicalExtra?: PassportTechnicalExtra;
 };
 
 export function PassportPanel({
   heritageName,
   heritageCraft,
   defaultShowTech = false,
+  pieceLine,
+  technicalExtra,
 }: PassportPanelProps) {
   const [showTech, setShowTech] = useState(defaultShowTech);
+  const technicalJson = technicalExtra
+    ? { ...PASSPORT_JSON_LD, ...technicalExtra }
+    : PASSPORT_JSON_LD;
 
   return (
     <section
@@ -94,6 +113,10 @@ export function PassportPanel({
         </div>
       </div>
 
+      {pieceLine ? (
+        <p className="mb-4 text-base leading-snug text-fm-ink">{pieceLine}</p>
+      ) : null}
+
       <div className="flex flex-wrap gap-2 mb-4">
         {BADGES.map((b) => (
           <span
@@ -151,7 +174,7 @@ export function PassportPanel({
               className="mt-3 p-3 rounded-xl bg-slate-900 text-fm-green text-xs overflow-x-auto leading-relaxed"
               tabIndex={0}
             >
-              {JSON.stringify(PASSPORT_JSON_LD, null, 2)}
+              {JSON.stringify(technicalJson, null, 2)}
             </pre>
             <p className="text-xs text-fm-muted mt-2">
               JSON-LD helps search engines and border systems read the same facts.
