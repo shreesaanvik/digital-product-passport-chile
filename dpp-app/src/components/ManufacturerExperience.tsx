@@ -14,6 +14,7 @@ import {
 import { PassportPanel, type PassportTechnicalExtra } from "./PassportPanel";
 import { useFormat, useT } from "@/i18n/LanguageProvider";
 import { phrase, toCanonical } from "@/i18n/labels";
+import { lockOverlayScroll } from "@/lib/scrollLock";
 import type { Messages } from "@/i18n/messages/es";
 
 type ManufacturerScreen = "order" | "passport";
@@ -458,11 +459,10 @@ function PieceSheet({
       if (event.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlock = lockOverlayScroll();
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previous;
+      unlock();
     };
   }, [onClose]);
 
@@ -486,7 +486,7 @@ function PieceSheet({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ duration: reduce ? 0 : 0.28, ease: "easeOut" }}
-        className="relative max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 shadow-2xl"
+        className="relative max-h-[min(85dvh,85%)] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-3">
           <h2 id={titleId} className="font-display text-2xl font-semibold text-fm-ink">

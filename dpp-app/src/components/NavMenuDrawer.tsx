@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useT } from "@/i18n/LanguageProvider";
 import type { AppScreen } from "@/lib/roles";
+import { lockOverlayScroll } from "@/lib/scrollLock";
 
 type MenuScreen = Extract<AppScreen, "story" | "pay" | "whats-live">;
 
@@ -41,14 +42,8 @@ export function NavMenuDrawer({
   }, [open, onClose]);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (!open) return;
+    return lockOverlayScroll();
   }, [open]);
 
   return (

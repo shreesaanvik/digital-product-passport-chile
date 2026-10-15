@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Outfit } from "next/font/google";
+import { PhoneFrame } from "@/components/PhoneFrame";
 import { es } from "@/i18n/messages/es";
 import "./globals.css";
 
@@ -39,7 +40,7 @@ export default function RootLayout({
             __html: `(function(){try{var q=new URLSearchParams(location.search).get("lang");document.documentElement.lang=q==="en"?"en":"es-CL";}catch(e){}})();`,
           }}
         />
-        {children}
+        <PhoneFrame>{children}</PhoneFrame>
       </body>
     </html>
   );

@@ -9,6 +9,7 @@ import {
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useT } from "@/i18n/LanguageProvider";
+import { lockOverlayScroll } from "@/lib/scrollLock";
 
 type Props = {
   open: boolean;
@@ -44,11 +45,7 @@ export function DemoSheet({ open, title, onClose, onReset, children }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
+    return lockOverlayScroll();
   }, [open]);
 
   function trapTab(event: ReactKeyboardEvent<HTMLDivElement>) {
@@ -93,7 +90,7 @@ export function DemoSheet({ open, title, onClose, onReset, children }: Props) {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ duration: reduce ? 0 : 0.28, ease: "easeOut" }}
-            className="relative flex h-[90dvh] w-full max-w-lg flex-col rounded-t-3xl bg-white shadow-2xl"
+            className="relative flex h-[min(90dvh,90%)] w-full max-w-lg flex-col rounded-t-3xl bg-white shadow-2xl"
           >
             <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
               <h2
