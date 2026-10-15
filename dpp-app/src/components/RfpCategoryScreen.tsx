@@ -113,9 +113,9 @@ function LogisticsCostCalculator() {
 }
 
 const REQUESTS = [
-  { id: "1", title: "Temple silk · Kanchipuram", status: "Open", closes: "Apr 28" },
-  { id: "2", title: "Ajrakh yardage · Kutch", status: "Reviewing", closes: "May 2" },
-  { id: "3", title: "Bandhani scarves · Jaipur", status: "Open", closes: "May 10" },
+  { id: "1", title: "Chamantos · Doñihue", status: "Open", closes: "Nov 14" },
+  { id: "2", title: "Lana chilota sweaters · Chiloé", status: "Reviewing", closes: "Nov 21" },
+  { id: "3", title: "Trariwe belts · Araucanía", status: "Open", closes: "Dec 5" },
 ] as const;
 
 export function RfpCategoryScreen() {
@@ -149,7 +149,7 @@ export function RfpCategoryScreen() {
         <input
           id="cluster-search-rfp"
           type="search"
-          placeholder="Search skill, cluster, or GI tag…"
+          placeholder="Search skill, cluster, or craft…"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           className="w-full min-h-[52px] rounded-xl border-2 border-slate-200 px-4 text-lg placeholder:text-slate-400 focus:border-fm-blue focus:outline-none"

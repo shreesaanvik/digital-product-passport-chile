@@ -3,17 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { CLUSTER_PASSPORTS, clusterById, stageIndex } from "@/lib/data";
+import { CLUSTER_PASSPORTS, EVIDENCE_GPS, STEWARD, clusterById, stageIndex } from "@/lib/data";
 
-const KUTCH_PATTERN = clusterById("kutch");
+const DONIHUE_PATTERN = clusterById("donihue");
 
-const KUTCH_PASSPORT = CLUSTER_PASSPORTS.kutch;
-const PRIOR_STEPS = KUTCH_PASSPORT.stages.slice(
+const DONIHUE_PASSPORT = CLUSTER_PASSPORTS.donihue;
+const PRIOR_STEPS = DONIHUE_PASSPORT.stages.slice(
   0,
-  stageIndex(KUTCH_PASSPORT.stages, KUTCH_PASSPORT.currentStage),
+  stageIndex(DONIHUE_PASSPORT.stages, DONIHUE_PASSPORT.currentStage),
 );
-const STAMP_PLACE = "23.24 N, 69.67 E (Kutch)";
-const STAMP_BY = "Recorded by Priya Chauhan, Steward";
+const STAMP_PLACE = EVIDENCE_GPS;
+const STAMP_BY = `Recorded by ${STEWARD.name}, ${STEWARD.role}`;
 
 function formatStamp(date: Date) {
   const day = date.toLocaleDateString("en-US", {
@@ -43,8 +43,8 @@ export function ProofOfHandDemo({ onRecorded }: ProofOfHandDemoProps = {}) {
           <div className="relative aspect-[3/4] w-full bg-slate-200">
             {recordedAt ? (
               <Image
-                src={KUTCH_PATTERN.image}
-                alt={KUTCH_PATTERN.imageAlt}
+                src={DONIHUE_PATTERN.image}
+                alt={DONIHUE_PATTERN.imageAlt}
                 fill
                 sizes="280px"
                 className="object-cover"

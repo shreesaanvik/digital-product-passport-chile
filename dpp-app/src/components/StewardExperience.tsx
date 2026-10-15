@@ -20,7 +20,7 @@ import { DemoSheet } from "./demos/DemoSheet";
 import { GovIdSyncDemo, type VerifiedGovId } from "./demos/GovIdSyncDemo";
 import { ProofOfHandDemo } from "./demos/ProofOfHandDemo";
 
-const KUTCH_PATTERN = clusterById("kutch");
+const DONIHUE_PATTERN = clusterById("donihue");
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -58,10 +58,10 @@ function copyRoster(): LiveArtisan[] {
 }
 
 function initialLogs(): Record<string, LiveEvidence[]> {
-  const lalita = ROSTER.find((artisan) => artisan.orderCode === ARTISAN.order.code);
-  if (!lalita) return {};
+  const featured = ROSTER.find((artisan) => artisan.orderCode === ARTISAN.order.code);
+  if (!featured) return {};
   return {
-    [lalita.id]: EVIDENCE_LOG.map((entry) => ({ ...entry })),
+    [featured.id]: EVIDENCE_LOG.map((entry) => ({ ...entry })),
   };
 }
 
@@ -135,7 +135,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
   function recordConsent(id: string) {
     const consent: LiveConsent = {
       date: formatDayMonth(new Date()),
-      language: "Kutchi",
+      language: "Spanish",
       ...(online ? {} : { sync: "pending" as const }),
     };
     setRoster((prev) =>
@@ -281,7 +281,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
             Back
           </button>
           <div className="mt-4">
-            <PassportPanel clusterId="kutch" />
+            <PassportPanel clusterId="donihue" />
           </div>
         </div>
       )}
@@ -443,8 +443,8 @@ function ArtisanDetail({
                 className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-neu"
               >
                 <Image
-                  src={KUTCH_PATTERN.image}
-                  alt={KUTCH_PATTERN.imageAlt}
+                  src={DONIHUE_PATTERN.image}
+                  alt={DONIHUE_PATTERN.imageAlt}
                   width={64}
                   height={64}
                   className="h-16 w-16 shrink-0 rounded-lg object-cover"

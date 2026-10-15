@@ -10,7 +10,7 @@ import {
   Tooltip,
   useMap,
 } from "react-leaflet";
-import { CLUSTERS } from "@/lib/data";
+import { CLUSTERS, type ClusterId } from "@/lib/data";
 
 import "leaflet/dist/leaflet.css";
 
@@ -19,12 +19,33 @@ const FM_BTN_BG = "#0081A1";
 const FM_BTN_TEXT = "#006E8A";
 
 type Props = {
-  selectedId: string | null;
-  onSelect: (id: string) => void;
+  selectedId: ClusterId | null;
+  onSelect: (id: ClusterId) => void;
   matchedIds?: string[] | null;
 };
 
-function FitSelection({ selectedId }: { selectedId: string | null }) {
+function FitChile() {
+  const map = useMap();
+
+  useEffect(() => {
+    const bounds = L.latLngBounds(CLUSTERS.map((c) => L.latLng(c.lat, c.lng)));
+    const fit = () => {
+      map.invalidateSize();
+      map.fitBounds(bounds, {
+        paddingTopLeft: [32, 36],
+        paddingBottomRight: [32, 64],
+        maxZoom: 5,
+      });
+    };
+    fit();
+    const timer = window.setTimeout(fit, 50);
+    return () => window.clearTimeout(timer);
+  }, [map]);
+
+  return null;
+}
+
+function FitSelection({ selectedId }: { selectedId: ClusterId | null }) {
   const map = useMap();
   const skipFirst = useRef(true);
 
@@ -44,8 +65,8 @@ function FitSelection({ selectedId }: { selectedId: string | null }) {
 }
 
 function pinClasses(
-  selectedId: string | null,
-  clusterId: string,
+  selectedId: ClusterId | null,
+  clusterId: ClusterId,
   matchedIds: string[] | null | undefined,
 ) {
   const filtering = matchedIds != null;
@@ -76,7 +97,7 @@ function pinClasses(
   };
 }
 
-export function IndiaMap({ selectedId, onSelect, matchedIds = null }: Props) {
+export function ChileMap({ selectedId, onSelect, matchedIds = null }: Props) {
   const bounds = useMemo(() => {
     const pts = CLUSTERS.map((c) => L.latLng(c.lat, c.lng));
     return L.latLngBounds(pts);
@@ -84,14 +105,20 @@ export function IndiaMap({ selectedId, onSelect, matchedIds = null }: Props) {
 
   return (
     <div
-      className="relative w-full max-h-[320px] min-h-[260px] rounded-2xl bg-slate-100 shadow-neu overflow-hidden border border-slate-200/80 z-0"
+      className="relative h-[420px] w-full rounded-2xl bg-slate-100 shadow-neu overflow-hidden border border-slate-200/80 z-0"
       role="application"
-      aria-label="Map of India with heritage craft clusters. Tap a marker to select."
+      aria-label="Map of Chile with heritage craft clusters. Tap a marker to select."
     >
       <MapContainer
         bounds={bounds}
-        boundsOptions={{ padding: [28, 28], maxZoom: 6 }}
-        className="h-[280px] w-full z-0 [&_.leaflet-control-attribution]:text-[10px] [&_.leaflet-control-attribution]:bg-white/90"
+        boundsOptions={{
+          paddingTopLeft: [32, 36],
+          paddingBottomRight: [32, 64],
+          maxZoom: 5,
+        }}
+        center={[-33.5, -71.2]}
+        zoom={4}
+        className="h-[420px] w-full z-0 [&_.leaflet-control-attribution]:text-[10px] [&_.leaflet-control-attribution]:bg-white/90"
         scrollWheelZoom={false}
         zoomSnap={0.25}
       >
@@ -99,6 +126,7 @@ export function IndiaMap({ selectedId, onSelect, matchedIds = null }: Props) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <FitChile />
         <FitSelection selectedId={selectedId} />
         {CLUSTERS.map((c) => {
           const active = selectedId === c.id;

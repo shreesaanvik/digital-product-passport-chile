@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { CLUSTER_PASSPORTS } from "@/lib/data";
 
-const KUTCH_PASSPORT = CLUSTER_PASSPORTS.kutch;
+const DONIHUE_PASSPORT = CLUSTER_PASSPORTS.donihue;
 
 const DEFAULT_FIELDS = {
-  product: KUTCH_PASSPORT.product,
-  material: KUTCH_PASSPORT.material,
-  origin: KUTCH_PASSPORT.origin_geo,
-  artisan: KUTCH_PASSPORT.artisan,
+  product: DONIHUE_PASSPORT.product,
+  material: DONIHUE_PASSPORT.material,
+  origin: DONIHUE_PASSPORT.origin_geo,
+  artisan: DONIHUE_PASSPORT.artisan,
 };
 
 type FieldKey = keyof typeof DEFAULT_FIELDS;

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppHeader } from "./AppHeader";
 import { BottomNav } from "./BottomNav";
-import { CLUSTERS } from "@/lib/data";
+import { CLUSTERS, type ClusterId } from "@/lib/data";
 import {
   BOTTOM_TABS,
   ROLE_PROFILES,
@@ -27,13 +27,13 @@ import { ArtisanStory } from "./ArtisanStory";
 import { StewardExperience } from "./StewardExperience";
 import { ManufacturerExperience } from "./ManufacturerExperience";
 
-const IndiaMap = dynamic(
-  () => import("./IndiaMap").then((m) => m.IndiaMap),
+const ChileMap = dynamic(
+  () => import("./ChileMap").then((m) => m.ChileMap),
   {
     ssr: false,
     loading: () => (
       <div
-        className="relative w-full min-h-[260px] max-h-[320px] rounded-2xl bg-gradient-to-b from-slate-100 to-white shadow-neu border border-slate-200/80 flex items-center justify-center text-fm-muted text-sm"
+        className="relative h-[420px] w-full rounded-2xl bg-gradient-to-b from-slate-100 to-white shadow-neu border border-slate-200/80 flex items-center justify-center text-fm-muted text-sm"
         role="status"
         aria-live="polite"
       >
@@ -57,7 +57,7 @@ export function HomeExperience() {
   const roleParam = searchParams.get("role");
   const role: Role | null = isRole(roleParam) ? roleParam : null;
 
-  const [clusterId, setClusterId] = useState("kutch");
+  const [clusterId, setClusterId] = useState<ClusterId>("donihue");
   const [menuOpen, setMenuOpen] = useState(false);
   const [screen, setScreen] = useState<AppScreen>(role ? defaultScreen(role) : "home");
   const [screenRole, setScreenRole] = useState<Role | null>(role);
@@ -127,7 +127,7 @@ export function HomeExperience() {
       <main className={`mx-auto max-w-lg px-4 pt-4 ${tabs.length > 0 ? "pb-28" : "pb-8"}`}>
         {activeScreen === "clusters" && (
           <>
-            <IndiaMap selectedId={clusterId} onSelect={setClusterId} />
+            <ChileMap selectedId={clusterId} onSelect={setClusterId} />
             {cluster && (
               <div
                 className="mt-4 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-neu"
@@ -145,6 +145,7 @@ export function HomeExperience() {
                 </div>
                 <div className="p-4">
                   <p className="font-display text-xl font-semibold text-fm-ink">{cluster.name}</p>
+                  <p className="text-fm-muted">{cluster.region}</p>
                   <p className="text-fm-muted">{cluster.craft}</p>
                   <p className="mt-2 text-fm-ink">
                     <strong>{cluster.orders}</strong> active orders ·{" "}
@@ -175,7 +176,7 @@ export function HomeExperience() {
 
         {activeScreen === "passport" && role !== "manufacturer" && (
           <PassportPanel
-            clusterId={cluster?.id ?? "kutch"}
+            clusterId={cluster?.id ?? "donihue"}
             defaultShowTech={role === "government"}
           />
         )}
@@ -192,7 +193,7 @@ export function HomeExperience() {
                 setScreen("home");
                 return;
               }
-              setClusterId("kutch");
+              setClusterId("donihue");
               setScreen(role === "steward" ? "passports" : "passport");
             }}
           />

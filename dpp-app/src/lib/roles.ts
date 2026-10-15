@@ -37,10 +37,10 @@ export function isRole(value: string | null): value is Role {
 }
 
 export const ROLE_PROFILES: Record<Role, RoleProfile> = {
-  steward: { initial: "P", name: "Priya", roleLabel: "Steward" },
-  artisan: { initial: "L", name: "Lalita", roleLabel: "Artisan" },
+  steward: { initial: "C", name: "Camila", roleLabel: "Steward" },
+  artisan: { initial: "R", name: "Rosa", roleLabel: "Artisan" },
   creative: { initial: "M", name: "Maren", roleLabel: "Creative" },
-  manufacturer: { initial: "D", name: "Devan", roleLabel: "Manufacturer" },
+  manufacturer: { initial: "P", name: "Patricio", roleLabel: "Manufacturer" },
   government: {
     initial: "G",
     name: "Government body",
@@ -49,6 +49,7 @@ export const ROLE_PROFILES: Record<Role, RoleProfile> = {
 };
 
 export function roleTooltip(role: Role): string {
+  if (role === "government") return "Government body (Chile)";
   const { name, roleLabel } = ROLE_PROFILES[role];
   if (name === roleLabel) return roleLabel;
   return `${name}, ${roleLabel}`;

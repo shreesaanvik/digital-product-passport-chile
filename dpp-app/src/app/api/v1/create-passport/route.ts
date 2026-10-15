@@ -3,7 +3,7 @@ import { CLUSTERS, CLUSTER_PASSPORTS, clusterById } from "@/lib/data";
 
 /**
  * Mock plug-and-play ingestor. POST /api/v1/create-passport
- * Pehchan ID + cluster + product returns a passport URL and hash.
+ * Artisan ID + cluster + product returns a passport URL and hash.
  */
 export async function POST(request: Request) {
   let body: {
@@ -20,10 +20,10 @@ export async function POST(request: Request) {
   }
 
   const artisan_id = body.artisan_id ?? "DEMO-ID";
-  const requested = (body.cluster ?? "Kutch").trim().toLowerCase();
+  const requested = (body.cluster ?? "Doñihue").trim().toLowerCase();
   const cluster =
     CLUSTERS.find((item) => item.name.toLowerCase() === requested) ??
-    clusterById("kutch");
+    clusterById("donihue");
   const passport = CLUSTER_PASSPORTS[cluster.id];
   const product = passport.product;
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     timestamp_handshake: new Date().toISOString(),
     esg_score: product.toLowerCase().includes("silk") ? "A" : "B",
     cluster_auto_meta: {
-      gi_hint: cluster.name === "Kutch" ? "Ajrakh" : "Heritage silk corridor",
+      origin_hint: cluster.craft,
     },
   });
 }

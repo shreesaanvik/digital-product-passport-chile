@@ -1,79 +1,69 @@
-export const SAMPLE_INR_PER_USD = 84;
+export const SAMPLE_CLP_PER_USD = 950;
 
-export const PASSPORT_COUNTRY = "IN";
+export const PASSPORT_COUNTRY = "CL";
 
 export const CLUSTERS = [
   {
-    id: "vns",
-    name: "Varanasi",
-    craft: "Zari Brocade",
-    orders: 24,
-    artisans: 890,
-    x: 62,
-    y: 42,
-    lat: 25.3176,
-    lng: 82.9739,
-    image: "/clusters/varanasi.jpg",
-    imageAlt: "Banarasi zari brocade pattern, Varanasi",
-  },
-  {
-    id: "kutch",
-    name: "Kutch",
-    craft: "Ajrakh Block-Print",
+    id: "donihue",
+    name: "Doñihue",
+    region: "O'Higgins",
+    craft: "Chamantos y mantas",
     orders: 12,
-    artisans: 250,
-    x: 38,
-    y: 58,
-    lat: 23.242,
-    lng: 69.6669,
-    image: "/clusters/kutch.jpg",
-    imageAlt: "Ajrakh block-print pattern, Kutch",
-  },
-  {
-    id: "kanchi",
-    name: "Kanchipuram",
-    craft: "Temple Silk",
-    orders: 18,
-    artisans: 410,
-    x: 52,
-    y: 88,
-    lat: 12.8342,
-    lng: 79.7036,
-    image: "/clusters/kanchipuram.jpg",
-    imageAlt: "Kanchipuram temple silk pattern",
-  },
-  {
-    id: "jaipur",
-    name: "Jaipur",
-    craft: "Bandhani & Gems",
-    orders: 31,
-    artisans: 620,
-    x: 35,
-    y: 48,
-    lat: 26.9124,
-    lng: 75.7873,
-    image: "/clusters/jaipur.jpg",
-    imageAlt: "Bandhani tie-dye pattern, Jaipur",
-  },
-  {
-    id: "murshidabad",
-    name: "Murshidabad",
-    craft: "Murshidabad Silk",
-    orders: 9,
     artisans: 180,
-    x: 58,
-    y: 52,
-    lat: 24.1839,
-    lng: 88.2717,
-    image: "/clusters/murshidabad.jpg",
-    imageAlt: "Murshidabad printed silk pattern",
+    lat: -34.226,
+    lng: -70.966,
+    image: "/clusters/donihue.jpg",
+    imageAlt: "Doñihue chamanto pattern",
+  },
+  {
+    id: "chiloe",
+    name: "Chiloé",
+    region: "Los Lagos",
+    craft: "Wool knitwear (lana chilota)",
+    orders: 9,
+    artisans: 240,
+    lat: -42.48,
+    lng: -73.76,
+    image: "/clusters/chiloe.jpg",
+    imageAlt: "Chiloé wool knit pattern",
+  },
+  {
+    id: "araucania",
+    name: "Araucanía",
+    region: "La Araucanía",
+    craft: "Mapuche textiles",
+    orders: 14,
+    artisans: 310,
+    lat: -38.74,
+    lng: -72.59,
+    image: "/clusters/araucania.jpg",
+    imageAlt: "Mapuche textile pattern",
+  },
+  {
+    id: "colchane",
+    name: "Colchane",
+    region: "Tarapacá",
+    craft: "Aymara alpaca textiles",
+    orders: 6,
+    artisans: 120,
+    lat: -19.28,
+    lng: -68.64,
+    image: "/clusters/colchane.jpg",
+    imageAlt: "Aymara textile pattern",
+  },
+  {
+    id: "quinchamali",
+    name: "Quinchamalí",
+    region: "Ñuble",
+    craft: "Black pottery",
+    orders: 5,
+    artisans: 60,
+    lat: -36.66,
+    lng: -72.2,
+    image: "/clusters/quinchamali.jpg",
+    imageAlt: "Quinchamalí black pottery pattern",
   },
 ] as const;
-
-export const BHUJODI_PATTERN = {
-  image: "/clusters/bhujodi.jpg",
-  imageAlt: "Bhujodi handloom weave pattern",
-} as const;
 
 export type ClusterId = (typeof CLUSTERS)[number]["id"];
 
@@ -97,54 +87,72 @@ export type ClusterPassport = {
   stages: readonly string[];
   currentStage: string;
   origin_geo: string;
+  badges: readonly string[];
 };
 
 export const CLUSTER_PASSPORTS: Record<ClusterId, ClusterPassport> = {
-  kutch: {
-    product: "Ajrakh cotton fabric",
-    material: "Cotton, natural indigo and madder dyes",
-    artisan: "Lalita Rabari, Ajrakhpur",
+  donihue: {
+    product: "Double-sided Doñihue chamanto",
+    material: "Fine wool and silk",
+    artisan: "Rosa Elena Muñoz, Doñihue",
     stages: [
-      "Fabric preparation",
-      "Block printing",
-      "Dyeing and washing",
+      "Thread preparation",
+      "Weaving",
+      "Finishing",
       "Quality check",
       "Shipped",
     ],
     currentStage: "Quality check",
-    origin_geo: originGeo("kutch"),
+    origin_geo: originGeo("donihue"),
+    badges: ["Handwoven", "Sello de Origen"],
   },
-  vns: {
-    product: "Banarasi silk saree",
-    material: "Mulberry silk, zari",
-    artisan: "Lakshmi Devi, Varanasi",
-    stages: ["Loom setup", "Weaving", "Quality check", "Shipped"],
-    currentStage: "Weaving",
-    origin_geo: originGeo("vns"),
-  },
-  kanchi: {
-    product: "Kanchipuram silk saree",
-    material: "Mulberry silk, zari",
-    artisan: "Weaver, Kanchipuram co-operative",
-    stages: ["Loom setup", "Weaving", "Quality check", "Shipped"],
+  chiloe: {
+    product: "Lana chilota sweater",
+    material: "Hand-spun sheep's wool",
+    artisan: "Cooperativa Lanas del Archipiélago, Castro",
+    stages: ["Spinning", "Dyeing", "Hand knitting", "Quality check", "Shipped"],
     currentStage: "Quality check",
-    origin_geo: originGeo("kanchi"),
+    origin_geo: originGeo("chiloe"),
+    badges: ["Hand-knitted", "Natural wool"],
   },
-  jaipur: {
-    product: "Bandhani dupatta",
-    material: "Cotton, natural dyes",
-    artisan: "Artisan, Jaipur co-operative",
-    stages: ["Tying", "Dyeing", "Opening and finishing", "Quality check", "Shipped"],
+  araucania: {
+    product: "Trariwe (woven belt)",
+    material: "Sheep's wool, natural dyes",
+    artisan: "Ayelén Painemal, La Araucanía",
+    stages: [
+      "Spinning",
+      "Dyeing",
+      "Weaving on the witral",
+      "Quality check",
+      "Shipped",
+    ],
+    currentStage: "Weaving on the witral",
+    origin_geo: originGeo("araucania"),
+    badges: ["Handwoven", "Natural dyes"],
+  },
+  colchane: {
+    product: "Alpaca awayu",
+    material: "Alpaca fibre",
+    artisan: "Justina Choque, Colchane",
+    stages: ["Spinning", "Dyeing", "Weaving", "Quality check", "Shipped"],
     currentStage: "Dyeing",
-    origin_geo: originGeo("jaipur"),
+    origin_geo: originGeo("colchane"),
+    badges: ["Handwoven", "Alpaca fibre"],
   },
-  murshidabad: {
-    product: "Murshidabad silk stole",
-    material: "Mulberry silk",
-    artisan: "Weaver, Murshidabad co-operative",
-    stages: ["Loom setup", "Weaving", "Quality check", "Shipped"],
-    currentStage: "Loom setup",
-    origin_geo: originGeo("murshidabad"),
+  quinchamali: {
+    product: "Black clay piece",
+    material: "Local clay",
+    artisan: "Elsa Sepúlveda, Quinchamalí",
+    stages: [
+      "Clay preparation",
+      "Shaping",
+      "Burnishing and incising",
+      "Firing",
+      "Shipped",
+    ],
+    currentStage: "Firing",
+    origin_geo: originGeo("quinchamali"),
+    badges: ["Handmade", "UNESCO Urgent Safeguarding List (2022)"],
   },
 };
 
@@ -153,8 +161,8 @@ export function stageIndex(stages: readonly string[], current: string): number {
   return index < 0 ? 0 : index;
 }
 
-export function inrFromUsd(usd: number): number {
-  return usd * SAMPLE_INR_PER_USD;
+export function clpFromUsd(usd: number): number {
+  return usd * SAMPLE_CLP_PER_USD;
 }
 
 type Milestone = {
@@ -166,12 +174,12 @@ type Milestone = {
 };
 
 export const MAIN_ORDER = {
-  code: "FM-KUT-2026",
-  buyer: "Maren Voss studio",
-  product: "Ajrakh cotton fabric, 20 metres",
-  routeFrom: "Kutch, India",
+  code: "FM-DON-2026",
+  buyer: "Maren Voss studio, New York",
+  product: "Double-sided Doñihue chamanto",
+  routeFrom: "Doñihue, Chile",
   routeTo: "New York, USA",
-  dutyNote: "HTS 5208.52 (printed cotton fabric)",
+  dutyNote: "HTS 6211.41 (wool garments)",
   buyerPays: 625,
   split: {
     artisan: { usd: 500, share: 80 },
@@ -181,7 +189,7 @@ export const MAIN_ORDER = {
   milestones: [
     {
       usd: 150,
-      release: "Block printing done",
+      release: "Weaving done",
       paymentLabel: "Order started",
       status: "paid",
       date: "12 Sep",
@@ -224,7 +232,7 @@ export const LANDED_COST_LINES = [
   {
     label: "Shipping",
     amount: MAIN_ORDER.split.logistics.shipping,
-    note: "Negotiated DHL / India Post rate",
+    note: "Negotiated DHL / Correos de Chile rate",
     prominent: false,
   },
   {
@@ -249,36 +257,41 @@ export type ArtisanPayment = {
 };
 
 export const ARTISAN = {
-  name: "Lalita Rabari",
-  craft: "Ajrakh block-print",
-  cluster: "Kutch, Gujarat",
-  generation: "Third-generation block-printer",
-  steward: { name: "Priya Chauhan", role: "Steward, Kutch", lastVisit: "28 Sep" },
+  name: "Rosa Elena Muñoz",
+  craft: "Chamantos y mantas",
+  cluster: "Doñihue, O'Higgins",
+  generation: "Third-generation weaver",
+  registryId: "CA-06-0412",
+  steward: {
+    name: "Camila Araya",
+    role: "Gestora territorial, O'Higgins",
+    lastVisit: "28 Sep",
+  },
   order: {
     code: MAIN_ORDER.code,
     product: MAIN_ORDER.product,
     buyer: MAIN_ORDER.buyer,
   },
-  stages: CLUSTER_PASSPORTS.kutch.stages,
+  stages: CLUSTER_PASSPORTS.donihue.stages,
   currentStage: stageIndex(
-    CLUSTER_PASSPORTS.kutch.stages,
-    CLUSTER_PASSPORTS.kutch.currentStage,
+    CLUSTER_PASSPORTS.donihue.stages,
+    CLUSTER_PASSPORTS.donihue.currentStage,
   ),
   payments: MAIN_ORDER.milestones.map(
     (milestone): ArtisanPayment => ({
       label: milestone.paymentLabel,
-      amount: inrFromUsd(milestone.usd),
+      amount: clpFromUsd(milestone.usd),
       status: milestone.status,
       ...(milestone.date ? { date: milestone.date } : {}),
     }),
   ),
-  currency: "INR",
+  currency: "CLP",
 };
 
 export const STEWARD = {
-  name: "Priya Chauhan",
-  role: "Steward",
-  area: "Kutch, Gujarat",
+  name: "Camila Araya",
+  role: "Gestora territorial",
+  area: "O'Higgins",
 } as const;
 
 export type RosterStatus = "Verified" | "Needs visit" | "Consent pending";
@@ -300,56 +313,56 @@ export type RosterArtisan = {
 
 export const ROSTER: RosterArtisan[] = [
   {
-    id: "KUT-4410",
-    name: "Lalita Rabari",
-    craft: "Ajrakh block-print",
-    village: "Ajrakhpur",
+    id: "CA-06-0412",
+    name: "Rosa Elena Muñoz",
+    craft: "Chamantos y mantas",
+    village: "Doñihue",
     status: "Verified",
-    consent: { date: "2 Sep", language: "Kutchi" },
+    consent: { date: "2 Sep", language: "Spanish" },
     orderCode: MAIN_ORDER.code,
   },
   {
-    id: "KUT-4417",
-    name: "Aamir Khatri",
-    craft: "Ajrakh block-print",
-    village: "Ajrakhpur",
+    id: "CA-06-0417",
+    name: "Luisa Contreras",
+    craft: "Chamantos y mantas",
+    village: "Doñihue",
     status: "Verified",
-    consent: { date: "3 Sep", language: "Kutchi" },
+    consent: { date: "3 Sep", language: "Spanish" },
     orderCode: null,
   },
   {
-    id: "KUT-4502",
-    name: "Rekha Vankar",
-    craft: "Handloom weaving",
-    village: "Bhujodi",
+    id: "CA-06-0502",
+    name: "Marisol Cáceres",
+    craft: "Mantas",
+    village: "Coltauco",
     status: "Needs visit",
-    consent: { date: "20 Aug", language: "Gujarati" },
-    orderCode: "FM-KUT-2031",
+    consent: { date: "20 Aug", language: "Spanish" },
+    orderCode: null,
   },
   {
-    id: "KUT-4521",
-    name: "Kanku Ahir",
-    craft: "Ahir embroidery",
-    village: "Dhaneti",
+    id: "CA-06-0521",
+    name: "Carmen Gutiérrez",
+    craft: "Loom weaving",
+    village: "Coltauco",
     status: "Consent pending",
     consent: null,
     orderCode: null,
   },
   {
-    id: "KUT-4533",
-    name: "Hasina Khatri",
-    craft: "Bandhani",
-    village: "Bhuj",
+    id: "CA-06-0533",
+    name: "Patricia Soto",
+    craft: "Embroidery",
+    village: "Rancagua",
     status: "Verified",
-    consent: { date: "5 Sep", language: "Kutchi" },
+    consent: { date: "5 Sep", language: "Spanish" },
     orderCode: null,
   },
 ];
 
 export const MANUFACTURER = {
-  name: "Devan Kapoor",
-  org: "Bhujodi Weavers Co-operative",
-  area: "Bhujodi, Kutch",
+  name: "Patricio Vera",
+  org: "Cooperativa Lanas del Archipiélago",
+  area: "Castro, Chiloé",
 } as const;
 
 export type PooledMaterials = {
@@ -367,11 +380,11 @@ export type PooledPiece = {
 };
 
 const POOLED_MAKERS = [
-  { id: "KUT-4502", name: "Rekha Vankar", village: "Bhujodi", pieces: 10 },
-  { id: "KUT-4606", name: "Mavji Vankar", village: "Bhujodi", pieces: 8 },
-  { id: "KUT-4611", name: "Shamji Vankar", village: "Bhujodi", pieces: 8 },
-  { id: "KUT-4615", name: "Lakshmi Vankar", village: "Sarli", pieces: 7 },
-  { id: "KUT-4620", name: "Naran Vankar", village: "Sarli", pieces: 7 },
+  { id: "CA-10-0301", name: "Marta Cárcamo", village: "Castro", pieces: 10 },
+  { id: "CA-10-0306", name: "Gladys Oyarzo", village: "Castro", pieces: 8 },
+  { id: "CA-10-0311", name: "Nelly Barrientos", village: "Dalcahue", pieces: 8 },
+  { id: "CA-10-0315", name: "Ana Mansilla", village: "Dalcahue", pieces: 7 },
+  { id: "CA-10-0320", name: "Teresa Vargas", village: "Chonchi", pieces: 7 },
 ] as const;
 
 function wovenDateForIndex(index: number): string {
@@ -385,7 +398,7 @@ function buildPooledPieces(): PooledPiece[] {
   for (const maker of POOLED_MAKERS) {
     for (let count = 0; count < maker.pieces; count += 1) {
       pieces.push({
-        id: `SH-${String(number).padStart(2, "0")}`,
+        id: `CH-${String(number).padStart(2, "0")}`,
         makerId: maker.id,
         carton: number <= 20 ? "A" : "B",
         wovenDate: wovenDateForIndex(number - 1),
@@ -400,29 +413,29 @@ function buildPooledPieces(): PooledPiece[] {
 export const POOLED_PIECES: PooledPiece[] = buildPooledPieces();
 
 export const POOLED_ORDER = {
-  code: "FM-KUT-2031",
-  product: "Handwoven wool shawl",
-  buyer: "Maren Voss studio",
+  code: "FM-CHL-2031",
+  product: "Lana chilota sweater",
+  buyer: "Maren Voss studio, New York",
   totalPieces: 40,
   stage: "Packed for shipping",
   materials: {
-    yarn: "Merino wool",
-    yarnSource: "Spun locally in Kutch",
-    dye: "Natural indigo",
+    yarn: "Sheep's wool",
+    yarnSource: "Hand-spun in Chiloé",
+    dye: "Undyed natural tones",
   } satisfies PooledMaterials,
   makers: POOLED_MAKERS,
   cartons: [
-    { id: "Carton A", pieces: "SH-01 to SH-20" },
-    { id: "Carton B", pieces: "SH-21 to SH-40" },
+    { id: "Carton A", pieces: "CH-01 to CH-20" },
+    { id: "Carton B", pieces: "CH-21 to CH-40" },
   ],
 } as const;
 
 export const POOLED_PASSPORT = {
-  product: POOLED_ORDER.product,
-  material: `${POOLED_ORDER.materials.yarn}, ${POOLED_ORDER.materials.dye}`,
-  stages: ["Loom setup", "Weaving", "Quality check", "Ship to warehouse"] as const,
-  currentStage: "Quality check",
-  origin_geo: originGeo("kutch"),
+  product: CLUSTER_PASSPORTS.chiloe.product,
+  material: CLUSTER_PASSPORTS.chiloe.material,
+  stages: CLUSTER_PASSPORTS.chiloe.stages,
+  currentStage: CLUSTER_PASSPORTS.chiloe.currentStage,
+  origin_geo: CLUSTER_PASSPORTS.chiloe.origin_geo,
 };
 
 export type EvidenceEntry = {
@@ -430,20 +443,20 @@ export type EvidenceEntry = {
   date: string;
 };
 
-export const EVIDENCE_GPS = "23.24 N, 69.67 E";
+export const EVIDENCE_GPS = "34.23 S, 70.97 W (Doñihue)";
 
 export const EVIDENCE_LOG: EvidenceEntry[] = [
-  { stage: "Fabric preparation", date: "12 Sep, 10:14" },
-  { stage: "Block printing", date: "18 Sep, 11:02" },
-  { stage: "Dyeing and washing", date: "24 Sep, 09:40" },
+  { stage: "Thread preparation", date: "12 Sep, 10:14" },
+  { stage: "Weaving", date: "18 Sep, 11:02" },
+  { stage: "Finishing", date: "24 Sep, 09:40" },
   { stage: "Quality check started", date: "28 Sep, 15:25" },
 ];
 
-export function formatInr(amount: number): string {
-  const grouped = new Intl.NumberFormat("en-IN", {
+export function formatClp(amount: number): string {
+  const grouped = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
   }).format(amount);
-  return `₹${grouped.replace(/\s/g, "")}`;
+  return `CLP ${grouped}`;
 }
 
 export function formatUsd(amount: number): string {

@@ -20,7 +20,7 @@ type Props = {
   onScreen: (screen: ManufacturerScreen) => void;
 };
 
-const TRACE_CHIPS = ["SH-07", "SH-23", "SH-38"] as const;
+const TRACE_CHIPS = ["CH-07", "CH-23", "CH-38"] as const;
 
 const MAKER_STYLES = [
   { tile: "bg-fm-blue text-fm-ink", bar: "bg-fm-blue" },
@@ -91,7 +91,7 @@ function traceMatch(raw: string) {
 
 export function ManufacturerExperience({ screen, onScreen }: Props) {
   const [screenSeen, setScreenSeen] = useState(screen);
-  const [selectedId, setSelectedId] = useState("SH-17");
+  const [selectedId, setSelectedId] = useState("CH-17");
   const [openPieceId, setOpenPieceId] = useState<string | null>(null);
   const [materials, setMaterials] = useState<PooledMaterials>(copyMaterials);
   const [draft, setDraft] = useState<PooledMaterials | null>(null);
@@ -161,7 +161,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
             <p className="mt-2 text-fm-ink">{POOLED_ORDER.product}</p>
             <p className="mt-1 text-fm-ink">Buyer: {POOLED_ORDER.buyer}</p>
             <p className="mt-1 text-fm-ink">
-              {POOLED_ORDER.totalPieces} pieces from {POOLED_ORDER.makers.length} weavers
+              {POOLED_ORDER.totalPieces} pieces from {POOLED_ORDER.makers.length} makers
             </p>
           </section>
 
@@ -263,7 +263,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                   value={traceInput}
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder="e.g. SH-23"
+                  placeholder="e.g. CH-23"
                   onChange={(event) => {
                     const value = event.target.value;
                     setTraceInput(value);
@@ -400,9 +400,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
           </select>
           <div className="mt-4">
             <PassportPanel
-              clusterId="kutch"
-              heritageName="Kutch"
-              heritageCraft="Bhujodi handloom weaving"
+              clusterId="chiloe"
               pieceLine={pieceSummary(selected)}
               technicalExtra={technicalFor(selected, materials)}
               pooled

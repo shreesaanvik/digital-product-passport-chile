@@ -7,12 +7,12 @@ import {
   artisanPaymentStatus,
   artisanPaymentTotals,
   clusterById,
-  formatInr,
+  formatClp,
 } from "@/lib/data";
 import { BackLink } from "./BackLink";
 import { PassportPanel } from "./PassportPanel";
 
-const KUTCH_PATTERN = clusterById("kutch");
+const DONIHUE_PATTERN = clusterById("donihue");
 
 const largeButtonClass =
   "btn-primary flex w-full min-h-[56px] items-center justify-center text-lg font-semibold";
@@ -44,7 +44,7 @@ export function ArtisanHome({ panel, onPanel }: Props) {
   return (
     <div className="text-lg text-fm-ink">
       <h1 className="font-display text-2xl font-semibold leading-tight text-fm-ink">
-        Namaste, {firstName}
+        Hola, {firstName}
       </h1>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {TILES.map((tile) => (
@@ -80,8 +80,8 @@ export function ArtisanHero({
   return (
     <div className="relative h-64 w-full overflow-hidden rounded-2xl">
       <Image
-        src={KUTCH_PATTERN.image}
-        alt={KUTCH_PATTERN.imageAlt}
+        src={DONIHUE_PATTERN.image}
+        alt={DONIHUE_PATTERN.imageAlt}
         fill
         sizes="(max-width: 512px) 100vw, 512px"
         className="object-cover object-center"
@@ -116,7 +116,7 @@ export function ArtisanMoneyPanel() {
           </span>
           <p className="font-semibold">Received</p>
           <p className="font-display text-2xl font-semibold leading-tight">
-            {formatInr(totals.received)}
+            {formatClp(totals.received)}
           </p>
         </div>
         <div className="flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center shadow-neu">
@@ -125,7 +125,7 @@ export function ArtisanMoneyPanel() {
           </span>
           <p className="font-semibold">Waiting</p>
           <p className="font-display text-2xl font-semibold leading-tight">
-            {formatInr(totals.waiting)}
+            {formatClp(totals.waiting)}
           </p>
         </div>
       </div>
@@ -140,7 +140,7 @@ export function ArtisanMoneyPanel() {
               <p className="text-fm-ink">{artisanPaymentStatus(payment)}</p>
             </div>
             <p className="shrink-0 font-display text-xl font-semibold text-fm-ink">
-              {formatInr(payment.amount)}
+              {formatClp(payment.amount)}
             </p>
           </li>
         ))}
@@ -334,7 +334,7 @@ function PassportDetail({ onBack }: { onBack: () => void }) {
       </button>
       {showFull && (
         <div className="mt-4">
-          <PassportPanel clusterId="kutch" />
+          <PassportPanel clusterId="donihue" />
         </div>
       )}
     </DetailShell>
@@ -435,7 +435,7 @@ function MoneyIcon({ className }: { className: string }) {
         fontWeight="700"
         fill="currentColor"
       >
-        ₹
+        $
       </text>
     </svg>
   );

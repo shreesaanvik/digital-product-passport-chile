@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatInr, formatUsd, inrFromUsd, MAIN_ORDER } from "@/lib/data";
+import { formatClp, formatUsd, clpFromUsd, MAIN_ORDER } from "@/lib/data";
 
 const ARTISAN_USD = MAIN_ORDER.split.artisan.usd;
 const OTHER_USD = MAIN_ORDER.buyerPays - ARTISAN_USD;
@@ -16,7 +16,7 @@ const STEPS = [
       .slice(0, index + 1)
       .reduce((sum, item) => sum + item.usd, 0);
     return {
-      label: `${milestone.release}, ${formatUsd(milestone.usd)} (${formatInr(inrFromUsd(milestone.usd))}) released`,
+      label: `${milestone.release}, ${formatUsd(milestone.usd)} (${formatClp(clpFromUsd(milestone.usd))}) released`,
       paid,
     };
   }),

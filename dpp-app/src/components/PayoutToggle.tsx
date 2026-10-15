@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import {
   ARTISAN,
   clusterById,
-  formatInr,
+  formatClp,
   formatUsd,
-  inrFromUsd,
+  clpFromUsd,
   MAIN_ORDER,
   MINGLE_PAYOUT_SHARES,
   OLD_PAYOUT_SHARES,
@@ -27,7 +27,7 @@ export function PayoutToggle() {
   const [mode, setMode] = useState<"old" | "new">("new");
   const rows = mode === "old" ? OLD_PAYOUT_SHARES : MINGLE_PAYOUT_SHARES;
   const artisanUsd = MAIN_ORDER.split.artisan.usd;
-  const clusterName = clusterById("kutch").name;
+  const clusterName = clusterById("donihue").name;
 
   return (
     <section
@@ -103,7 +103,7 @@ export function PayoutToggle() {
       <div className="mt-6 rounded-xl bg-fm-surface p-4 border border-slate-200">
         <p className="text-sm text-fm-muted mb-1">Sample order</p>
         <p className="text-fm-ink">
-          {`${ARTISAN.name}, ${clusterName}. Artisan receives ${formatUsd(artisanUsd)} (${formatInr(inrFromUsd(artisanUsd))}) on this order.`}
+          {`${ARTISAN.name}, ${clusterName}. Artisan receives ${formatUsd(artisanUsd)} (${formatClp(clpFromUsd(artisanUsd))}) on this order.`}
         </p>
       </div>
     </section>

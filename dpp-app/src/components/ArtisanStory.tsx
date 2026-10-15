@@ -11,8 +11,7 @@ export function ArtisanStory({ onOpenPassport }: Props) {
   const artisanFirst = ARTISAN.name.split(" ")[0];
   const stewardFirst = ARTISAN.steward.name.split(" ")[0];
   const place = ARTISAN.cluster.split(",")[0].trim();
-  const printer = ARTISAN.craft.replace(/print$/, "printer");
-  const subtitle = `${ARTISAN.generation.replace(/block-printer$/, printer)}, ${place}`;
+  const subtitle = `${ARTISAN.generation}, ${place}`;
   const stage = ARTISAN.stages[ARTISAN.currentStage].toLowerCase();
 
   return (

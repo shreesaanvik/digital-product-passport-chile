@@ -4,20 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { clusterById, ROSTER } from "@/lib/data";
 
-const lalita = ROSTER.find((artisan) => artisan.id === "KUT-4410");
+const rosa = ROSTER.find((artisan) => artisan.id === "CA-06-0412");
 
 const SAMPLE_RECORDS = {
-  "KUT-4410": {
-    name: lalita?.name ?? "Lalita Rabari",
-    craft: lalita?.craft ?? "Ajrakh block-print",
-    cluster: clusterById("kutch").name,
+  "CA-06-0412": {
+    name: rosa?.name ?? "Rosa Elena Muñoz",
+    craft: rosa?.craft ?? "Chamantos y mantas",
+    cluster: clusterById("donihue").name,
     years: 18,
   },
-  "VAR-9982": {
-    name: "Meera Devi",
-    craft: "Zari Brocade",
-    cluster: "Varanasi",
-    years: 24,
+  "CA-09-2208": {
+    name: "Ayelén Painemal",
+    craft: "Mapuche textiles",
+    cluster: clusterById("araucania").name,
+    years: 22,
   },
 } as const;
 
@@ -98,7 +98,7 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
           type="text"
           inputMode="text"
           autoComplete="off"
-          placeholder="e.g. KUT-4410"
+          placeholder="e.g. CA-06-0412"
           value={id}
           onChange={(event) => {
             setId(event.target.value);

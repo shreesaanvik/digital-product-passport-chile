@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BHUJODI_PATTERN,
   CLUSTER_PASSPORTS,
   clusterById,
   passportJsonLd,
@@ -12,12 +11,6 @@ import {
   stageIndex,
   type ClusterId,
 } from "@/lib/data";
-
-const BADGES = [
-  { label: "Hand-woven", icon: "◇" },
-  { label: "Natural dye", icon: "◆" },
-  { label: "Fair wage step", icon: "✓" },
-];
 
 export type PassportTechnicalExtra = {
   pieceId: string;
@@ -55,7 +48,8 @@ export function PassportPanel({
   const passport = CLUSTER_PASSPORTS[clusterId];
   const title = heritageName ?? cluster.name;
   const craft = heritageCraft ?? cluster.craft;
-  const hero = pooled ? BHUJODI_PATTERN : cluster;
+  const hero = cluster;
+  const badges = passport.badges;
   const stages = pooled ? POOLED_PASSPORT.stages : passport.stages;
   const currentName = pooled ? POOLED_PASSPORT.currentStage : passport.currentStage;
   const currentIndex = stageIndex(stages, currentName);
@@ -147,12 +141,12 @@ export function PassportPanel({
       ) : null}
 
       <div className="flex flex-wrap gap-2 mb-4">
-        {BADGES.map((b) => (
+        {badges.map((label) => (
           <span
-            key={b.label}
+            key={label}
             className="inline-flex items-center gap-1 rounded-full bg-fm-green-soft text-fm-green px-3 py-1.5 text-sm font-medium border border-fm-green/25"
           >
-            <span aria-hidden>{b.icon}</span> {b.label}
+            <span aria-hidden>◇</span> {label}
           </span>
         ))}
       </div>
