@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
 import {
   CLUSTER_PASSPORTS,
   clusterById,
@@ -43,11 +45,12 @@ export function PassportPanel({
   technicalExtra,
   pooled = false,
 }: PassportPanelProps) {
+  const t = useT();
   const [showTech, setShowTech] = useState(defaultShowTech);
   const cluster = clusterById(clusterId);
   const passport = CLUSTER_PASSPORTS[clusterId];
   const title = heritageName ?? cluster.name;
-  const craft = heritageCraft ?? cluster.craft;
+  const craft = phrase(heritageCraft ?? cluster.craft, t);
   const hero = cluster;
   const badges = passport.badges;
   const stages = pooled ? POOLED_PASSPORT.stages : passport.stages;
@@ -85,14 +88,14 @@ export function PassportPanel({
         <div
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-2 border-fm-blue/20 bg-white"
           role="img"
-          aria-label="QR code"
+          aria-label={t.common.qr}
         >
           <span className="text-xl text-fm-blue/40" aria-hidden>
             ▣
           </span>
         </div>
         <p className="text-xs text-fm-muted leading-snug">
-          Scan on a real label → opens this passport
+          {t.passport.scan}
         </p>
       </div>
 
@@ -100,18 +103,17 @@ export function PassportPanel({
         id="passport-heading"
         className="font-display text-xl font-semibold text-fm-blue mb-1"
       >
-        Digital Product Passport
+        {t.passport.title}
       </h2>
       <p className="text-fm-muted text-base mb-4">
-        What a shopper or customs officer sees after scanning the QR code on the
-        label.
+        {t.passport.intro}
       </p>
 
       <div className="-mx-5 mb-4">
         <div className="relative h-[200px] w-full overflow-hidden">
           <Image
             src={hero.image}
-            alt={hero.imageAlt}
+            alt={phrase(hero.imageAlt, t)}
             fill
             sizes="(max-width: 512px) 100vw, 512px"
             className="object-cover object-center scale-105"
@@ -123,7 +125,7 @@ export function PassportPanel({
           />
           <div className="absolute inset-x-0 bottom-0 p-5">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/65">
-              Heritage story
+              {t.passport.heritage}
             </p>
             <div className="mt-2 h-px w-10 bg-fm-blue/80" aria-hidden />
             <p className="font-display text-[1.65rem] font-semibold leading-tight text-white mt-3 tracking-tight">
@@ -146,13 +148,13 @@ export function PassportPanel({
             key={label}
             className="inline-flex items-center gap-1 rounded-full bg-fm-green-soft text-fm-green px-3 py-1.5 text-sm font-medium border border-fm-green/25"
           >
-            <span aria-hidden>◇</span> {label}
+            <span aria-hidden>◇</span> {phrase(label, t)}
           </span>
         ))}
       </div>
 
       <h3 className="text-sm font-semibold text-fm-ink uppercase tracking-wide mb-2">
-        Journey
+        {t.passport.journey}
       </h3>
       <ol className="space-y-2 mb-4">
         {stages.map((step, i) => {
@@ -172,7 +174,7 @@ export function PassportPanel({
                 {i + 1}
               </span>
               <span className={status === "upcoming" ? "text-fm-muted" : "text-fm-ink"}>
-                {step}
+                {phrase(step, t)}
               </span>
             </li>
           );
@@ -185,7 +187,7 @@ export function PassportPanel({
         className="w-full min-h-[52px] rounded-xl border-2 border-fm-btn-bg text-fm-btn-text font-semibold text-lg hover:bg-fm-surface transition-colors"
         aria-expanded={showTech}
       >
-        {showTech ? "Hide technical details" : "Technical view (EU / customs)"}
+        {showTech ? t.passport.hideTech : t.passport.showTech}
       </button>
 
       <AnimatePresence>
@@ -203,7 +205,7 @@ export function PassportPanel({
               {JSON.stringify(technicalJson, null, 2)}
             </pre>
             <p className="text-xs text-fm-muted mt-2">
-              JSON-LD helps search engines and border systems read the same facts.
+              {t.passport.jsonNote}
             </p>
           </motion.div>
         )}

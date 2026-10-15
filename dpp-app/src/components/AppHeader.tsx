@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useT } from "@/i18n/LanguageProvider";
+import { HeaderMarks } from "./LangToggle";
 
 type Props = {
   onMenuClick: () => void;
@@ -10,6 +12,8 @@ type Props = {
 };
 
 export function AppHeader({ onMenuClick, menuOpen, initial, tooltip }: Props) {
+  const t = useT();
+
   return (
     <header className="sticky top-0 z-40 bg-fm-surface/95 backdrop-blur-md border-b border-slate-200/80">
       <div className="mx-auto flex max-w-lg items-center justify-between gap-3 px-4 py-3">
@@ -17,7 +21,7 @@ export function AppHeader({ onMenuClick, menuOpen, initial, tooltip }: Props) {
           type="button"
           onClick={onMenuClick}
           className="flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-xl bg-white shadow-neu text-fm-blue"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-label={menuOpen ? t.header.closeMenu : t.header.openMenu}
           aria-expanded={menuOpen}
           aria-controls="app-nav-drawer"
         >
@@ -28,19 +32,15 @@ export function AppHeader({ onMenuClick, menuOpen, initial, tooltip }: Props) {
         <div className="text-center flex flex-col items-center">
           <Image
             src="/logo.png"
-            alt="Fashion Mingle"
+            alt={t.header.brand}
             width={280}
             height={24}
             className="h-[24px] w-auto"
             style={{ width: "auto", height: "24px" }}
             priority
           />
-          <p className="text-xs text-fm-ink -mt-0.5">
-            Digital Product Passport
-          </p>
-          <span className="mt-1 inline-flex items-center rounded-full border-[1.5px] border-[#0081A1] bg-white px-2 py-0.5 text-[11px] font-semibold leading-none text-[#006E8A]">
-            Demo
-          </span>
+          <p className="text-xs text-fm-ink -mt-0.5">{t.header.dpp}</p>
+          <HeaderMarks />
         </div>
         <div
           className="flex h-11 w-11 items-center justify-center rounded-full bg-fm-blue text-white font-display font-bold text-xl shadow-md"

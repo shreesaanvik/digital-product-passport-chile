@@ -1,9 +1,45 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatUsd, LANDED_COST_LINES, MAIN_ORDER } from "@/lib/data";
+import { useFormat, useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
+import type { Messages } from "@/i18n/messages/es";
+import { LANDED_COST_LINES } from "@/lib/data";
+import type { DayMonth } from "@/lib/format";
+
+function lineLabel(id: string, t: Messages) {
+  switch (id) {
+    case "artisan":
+      return t.rfp.artisanPayout;
+    case "shipping":
+      return t.rfp.shipping;
+    case "duty":
+      return t.rfp.importDuty;
+    case "platform":
+      return t.rfp.platformFee;
+    default:
+      return id;
+  }
+}
+
+function lineNote(note: string, t: Messages) {
+  switch (note) {
+    case "paidOnOrder":
+      return t.rfp.paidOnOrder;
+    case "shippingRate":
+      return t.rfp.shippingRate;
+    case "dutyNote":
+      return t.rfp.dutyNote;
+    case "platformNote":
+      return t.rfp.platformNote;
+    default:
+      return note;
+  }
+}
 
 function LogisticsCostCalculator() {
+  const t = useT();
+  const format = useFormat();
   const [quantity, setQuantity] = useState(1);
   const [locked, setLocked] = useState(false);
 
@@ -31,19 +67,17 @@ function LogisticsCostCalculator() {
         id="logistics-calculator-heading"
         className="font-display text-lg font-semibold text-fm-blue mb-3"
       >
-        Logistics &amp; landed cost
+        {t.rfp.logistics}
       </h2>
       <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-neu">
-        <h3 className="font-display text-xl font-semibold text-fm-ink">
-          Village-to-Doorstep Logistics
-        </h3>
+        <h3 className="font-display text-xl font-semibold text-fm-ink">{t.rfp.villageDoor}</h3>
         <p className="mt-1 text-sm text-fm-muted">
-          {MAIN_ORDER.routeFrom} to {MAIN_ORDER.routeTo}
+          {t.rfp.routeFrom} {t.rfp.to} {t.rfp.routeTo}
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-fm-btn-light/60 px-4 py-3 border border-fm-blue/15">
           <label htmlFor="order-quantity" className="text-sm font-medium text-fm-btn-text">
-            Order quantity
+            {t.rfp.quantity}
           </label>
           <input
             id="order-quantity"
@@ -60,7 +94,7 @@ function LogisticsCostCalculator() {
         <ul className="mt-5 space-y-0 divide-y divide-slate-100">
           {lineItems.map((item) => (
             <li
-              key={item.label}
+              key={item.id}
               className={`flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 ${
                 item.prominent
                   ? "rounded-xl bg-fm-green-soft/80 -mx-2 px-2 border border-fm-green/20"
@@ -73,9 +107,9 @@ function LogisticsCostCalculator() {
                     item.prominent ? "font-semibold text-fm-green" : "font-medium text-fm-ink"
                   }`}
                 >
-                  {item.label}
+                  {lineLabel(item.id, t)}
                 </p>
-                <p className="text-xs text-fm-muted mt-0.5">{item.note}</p>
+                <p className="text-xs text-fm-muted mt-0.5">{lineNote(item.note, t)}</p>
               </div>
               <p
                 className={`shrink-0 tabular-nums ${
@@ -84,16 +118,16 @@ function LogisticsCostCalculator() {
                     : "text-sm font-semibold text-fm-ink"
                 }`}
               >
-                {formatUsd(item.amount)}
+                {format.usd(item.amount)}
               </p>
             </li>
           ))}
         </ul>
 
         <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-fm-surface px-4 py-3 border border-slate-200">
-          <p className="font-display font-semibold text-fm-ink">Total landed cost</p>
+          <p className="font-display font-semibold text-fm-ink">{t.rfp.total}</p>
           <p className="font-display text-xl font-bold text-fm-blue tabular-nums">
-            {formatUsd(total)}
+            {format.usd(total)}
           </p>
         </div>
 
@@ -102,38 +136,45 @@ function LogisticsCostCalculator() {
           onClick={() => setLocked(true)}
           className="mt-5 w-full min-h-[52px] rounded-xl bg-fm-btn-bg text-white text-base font-semibold shadow-md hover:bg-fm-btn-text transition-colors"
         >
-          {locked ? "Rate locked ✓" : "Confirm & Lock Rate"}
+          {locked ? t.rfp.locked : t.rfp.confirm}
         </button>
-        <p className="mt-2 text-center text-xs text-fm-muted">
-          Includes automated Digital Product Passport and customs documentation.
-        </p>
+        <p className="mt-2 text-center text-xs text-fm-muted">{t.rfp.includes}</p>
       </div>
     </section>
   );
 }
 
-const REQUESTS = [
-  { id: "1", title: "Chamantos · Doñihue", status: "Open", closes: "Nov 14" },
-  { id: "2", title: "Lana chilota sweaters · Chiloé", status: "Reviewing", closes: "Nov 21" },
-  { id: "3", title: "Trariwe belts · Araucanía", status: "Open", closes: "Dec 5" },
-] as const;
+const REQUESTS: { id: string; title: string; status: string; closes: DayMonth }[] = [
+  { id: "1", title: "Chamantos · Doñihue", status: "Open", closes: { day: 14, month: 11 } },
+  {
+    id: "2",
+    title: "Lana chilota sweaters · Chiloé",
+    status: "Reviewing",
+    closes: { day: 21, month: 11 },
+  },
+  {
+    id: "3",
+    title: "Trariwe belts · Araucanía",
+    status: "Open",
+    closes: { day: 5, month: 12 },
+  },
+];
 
 export function RfpCategoryScreen() {
+  const t = useT();
+  const format = useFormat();
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
-  const requests = REQUESTS.filter((request) =>
-    request.title.toLowerCase().includes(needle),
-  );
+  const requests = REQUESTS.filter((request) => {
+    const title = phrase(request.title, t).toLowerCase();
+    return title.includes(needle) || request.title.toLowerCase().includes(needle);
+  });
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-semibold text-fm-blue">
-          RFPs &amp; direct sourcing
-        </h1>
-        <p className="mt-2 text-fm-muted text-base">
-          Post and browse sourcing requests.
-        </p>
+        <h1 className="font-display text-2xl font-semibold text-fm-blue">{t.rfp.title}</h1>
+        <p className="mt-2 text-fm-muted text-base">{t.rfp.intro}</p>
       </header>
 
       <section aria-labelledby="sourcing-search-heading">
@@ -141,15 +182,15 @@ export function RfpCategoryScreen() {
           id="sourcing-search-heading"
           className="font-display text-lg font-semibold text-fm-blue mb-3"
         >
-          Find clusters &amp; skills
+          {t.rfp.find}
         </h2>
         <label htmlFor="cluster-search-rfp" className="sr-only">
-          Search heritage skill or cluster
+          {t.rfp.searchLabel}
         </label>
         <input
           id="cluster-search-rfp"
           type="search"
-          placeholder="Search skill, cluster, or craft…"
+          placeholder={t.rfp.searchPlaceholder}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           className="w-full min-h-[52px] rounded-xl border-2 border-slate-200 px-4 text-lg placeholder:text-slate-400 focus:border-fm-blue focus:outline-none"
@@ -161,10 +202,10 @@ export function RfpCategoryScreen() {
           id="open-rfp-heading"
           className="font-display text-lg font-semibold text-fm-blue mb-3"
         >
-          Open requests
+          {t.rfp.openRequests}
         </h2>
         {requests.length === 0 ? (
-          <p className="text-sm text-fm-muted">No requests match</p>
+          <p className="text-sm text-fm-muted">{t.rfp.noMatch}</p>
         ) : (
           <ul className="flex flex-col gap-3">
             {requests.map((r) => (
@@ -173,7 +214,7 @@ export function RfpCategoryScreen() {
                 className="rounded-2xl border border-slate-100 bg-white p-4 shadow-neu"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-display font-semibold text-fm-ink">{r.title}</p>
+                  <p className="font-display font-semibold text-fm-ink">{phrase(r.title, t)}</p>
                   <span
                     className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                       r.status === "Open"
@@ -181,10 +222,10 @@ export function RfpCategoryScreen() {
                         : "bg-fm-orange-soft text-fm-orange"
                     }`}
                   >
-                    {r.status}
+                    {phrase(r.status, t)}
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-fm-muted">Closes {r.closes}</p>
+                <p className="mt-2 text-sm text-fm-muted">{t.rfp.closes(format.dayMonth(r.closes))}</p>
               </li>
             ))}
           </ul>

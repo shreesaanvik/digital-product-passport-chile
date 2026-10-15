@@ -1,3 +1,5 @@
+import type { Messages } from "@/i18n/messages/es";
+
 export const ROLES = [
   "steward",
   "artisan",
@@ -22,14 +24,12 @@ export type AppScreen =
 
 export type BottomTab = {
   id: AppScreen;
-  label: string;
   icon: string;
 };
 
 export type RoleProfile = {
   initial: string;
   name: string;
-  roleLabel: string;
 };
 
 export function isRole(value: string | null): value is Role {
@@ -37,71 +37,39 @@ export function isRole(value: string | null): value is Role {
 }
 
 export const ROLE_PROFILES: Record<Role, RoleProfile> = {
-  steward: { initial: "C", name: "Camila", roleLabel: "Steward" },
-  artisan: { initial: "R", name: "Rosa", roleLabel: "Artisan" },
-  creative: { initial: "M", name: "Maren", roleLabel: "Creative" },
-  manufacturer: { initial: "P", name: "Patricio", roleLabel: "Manufacturer" },
-  government: {
-    initial: "G",
-    name: "Government body",
-    roleLabel: "Government body",
-  },
+  steward: { initial: "C", name: "Camila" },
+  artisan: { initial: "R", name: "Rosa" },
+  creative: { initial: "M", name: "Maren" },
+  manufacturer: { initial: "P", name: "Patricio" },
+  government: { initial: "G", name: "" },
 };
 
-export function roleTooltip(role: Role): string {
-  if (role === "government") return "Government body (Chile)";
-  const { name, roleLabel } = ROLE_PROFILES[role];
-  if (name === roleLabel) return roleLabel;
-  return `${name}, ${roleLabel}`;
+export function roleTooltip(role: Role, t: Messages): string {
+  if (role === "government") return t.roles.governmentTip;
+  return `${ROLE_PROFILES[role].name}, ${t.roles[role]}`;
 }
 
-export const EXPLORE_CARDS: { role: Role; title: string; line: string }[] = [
-  {
-    role: "steward",
-    title: "Steward",
-    line: "Onboard artisans and record proof of their work",
-  },
-  {
-    role: "artisan",
-    title: "Artisan",
-    line: "See your work, payments and passport",
-  },
-  {
-    role: "creative",
-    title: "Creative",
-    line: "Find makers, post requests and view passports",
-  },
-  {
-    role: "manufacturer",
-    title: "Manufacturer",
-    line: "Track pooled orders back to each maker",
-  },
-  {
-    role: "government",
-    title: "Government body",
-    line: "Review features and inspect passport data",
-  },
-];
+export const EXPLORE_ROLES: Role[] = [...ROLES];
 
 export const BOTTOM_TABS: Record<Role, BottomTab[]> = {
   steward: [
-    { id: "artisans", label: "Artisans", icon: "☺" },
-    { id: "passports", label: "Passports", icon: "▣" },
+    { id: "artisans", icon: "☺" },
+    { id: "passports", icon: "▣" },
   ],
   artisan: [],
   creative: [
-    { id: "clusters", label: "Clusters", icon: "◎" },
-    { id: "passport", label: "Passport", icon: "▣" },
-    { id: "rfps", label: "RFPs", icon: "📁" },
+    { id: "clusters", icon: "◎" },
+    { id: "passport", icon: "▣" },
+    { id: "rfps", icon: "📁" },
   ],
   manufacturer: [
-    { id: "order", label: "Order", icon: "☰" },
-    { id: "passport", label: "Passport", icon: "▣" },
+    { id: "order", icon: "☰" },
+    { id: "passport", icon: "▣" },
   ],
   government: [
-    { id: "clusters", label: "Clusters", icon: "◎" },
-    { id: "passport", label: "Passport", icon: "▣" },
-    { id: "whats-live", label: "Features", icon: "●" },
+    { id: "clusters", icon: "◎" },
+    { id: "passport", icon: "▣" },
+    { id: "whats-live", icon: "●" },
   ],
 };
 

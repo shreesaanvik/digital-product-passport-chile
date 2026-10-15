@@ -12,6 +12,9 @@ import {
   type PooledPiece,
 } from "@/lib/data";
 import { PassportPanel, type PassportTechnicalExtra } from "./PassportPanel";
+import { useFormat, useT } from "@/i18n/LanguageProvider";
+import { phrase, toCanonical } from "@/i18n/labels";
+import type { Messages } from "@/i18n/messages/es";
 
 type ManufacturerScreen = "order" | "passport";
 
@@ -30,14 +33,12 @@ const MAKER_STYLES = [
   { tile: "bg-fm-purple text-white", bar: "bg-fm-purple" },
 ] as const;
 
-const MISSING_PIECE = "No piece with that ID in this order.";
-
-function resolveMaker(makerId: string) {
+function resolveMaker(makerId: string, unknownLabel: string) {
   const assigned = POOLED_ORDER.makers.find((maker) => maker.id === makerId);
   const roster = ROSTER.find((artisan) => artisan.id === makerId);
   return {
     id: makerId,
-    name: roster?.name ?? assigned?.name ?? "Unknown maker",
+    name: roster?.name ?? assigned?.name ?? unknownLabel,
     village: roster?.village ?? assigned?.village ?? "",
     pieces: assigned?.pieces ?? 0,
   };
@@ -48,18 +49,20 @@ function makerStyle(makerId: string) {
   return MAKER_STYLES[index] ?? MAKER_STYLES[0];
 }
 
-function piecesLabel(count: number) {
-  return count === 1 ? "1 piece" : `${count} pieces`;
-}
-
-function pieceSummary(piece: PooledPiece) {
-  const maker = resolveMaker(piece.makerId);
+function pieceSummary(piece: PooledPiece, t: Messages) {
+  const maker = resolveMaker(piece.makerId, t.manufacturer.unknownMaker);
   const number = Number(piece.id.slice(3));
-  return `Piece ${number} of ${POOLED_ORDER.totalPieces} in order ${POOLED_ORDER.code}. Made by ${maker.name}, ${maker.village}.`;
+  return t.manufacturer.pieceSummary({
+    number,
+    total: POOLED_ORDER.totalPieces,
+    code: POOLED_ORDER.code,
+    name: maker.name,
+    village: maker.village,
+  });
 }
 
 function technicalFor(piece: PooledPiece, materials: PooledMaterials): PassportTechnicalExtra {
-  const maker = resolveMaker(piece.makerId);
+  const maker = resolveMaker(piece.makerId, "Unknown maker");
   return {
     pieceId: piece.id,
     makerArtisanId: maker.id,
@@ -77,19 +80,25 @@ function copyMaterials(): PooledMaterials {
   };
 }
 
-function traceMatch(raw: string) {
+function traceMatch(raw: string, t: Messages) {
   const key = raw.trim().toUpperCase();
   if (!key) return null;
   const piece = POOLED_PIECES.find((item) => item.id === key);
   if (!piece) return null;
-  const maker = resolveMaker(piece.makerId);
+  const maker = resolveMaker(piece.makerId, t.manufacturer.unknownMaker);
   return {
     id: piece.id,
-    text: `${piece.id} was made by ${maker.name}, ${maker.village}, and is in Carton ${piece.carton}.`,
+    text: t.manufacturer.traceFound({
+      id: piece.id,
+      name: maker.name,
+      village: maker.village,
+      carton: piece.carton,
+    }),
   };
 }
 
 export function ManufacturerExperience({ screen, onScreen }: Props) {
+  const t = useT();
   const [screenSeen, setScreenSeen] = useState(screen);
   const [selectedId, setSelectedId] = useState("CH-17");
   const [openPieceId, setOpenPieceId] = useState<string | null>(null);
@@ -120,11 +129,11 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
   const openPiece = POOLED_PIECES.find((piece) => piece.id === openPieceId) ?? null;
 
   function applyTrace(raw: string) {
-    const match = traceMatch(raw);
+    const match = traceMatch(raw, t);
     if (!match) {
       setTraceInput(raw.trim());
       setTraceFound(false);
-      setTraceMessage(MISSING_PIECE);
+      setTraceMessage(t.manufacturer.missingPiece);
       return;
     }
     setTraceInput(match.id);
@@ -136,9 +145,9 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
     event.preventDefault();
     if (!draft) return;
     setMaterials({
-      yarn: draft.yarn.trim(),
-      yarnSource: draft.yarnSource.trim(),
-      dye: draft.dye.trim(),
+      yarn: toCanonical(draft.yarn),
+      yarnSource: toCanonical(draft.yarnSource),
+      dye: toCanonical(draft.dye),
     });
     setDraft(null);
   }
@@ -155,21 +164,21 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <h1 className="font-display text-xl font-semibold text-fm-ink">{POOLED_ORDER.code}</h1>
               <span className="inline-flex shrink-0 rounded-full border border-fm-green/25 bg-fm-green-soft px-2.5 py-1 text-xs font-semibold text-fm-green">
-                {POOLED_ORDER.stage}
+                {phrase(POOLED_ORDER.stage, t)}
               </span>
             </div>
-            <p className="mt-2 text-fm-ink">{POOLED_ORDER.product}</p>
-            <p className="mt-1 text-fm-ink">Buyer: {POOLED_ORDER.buyer}</p>
+            <p className="mt-2 text-fm-ink">{phrase(POOLED_ORDER.product, t)}</p>
+            <p className="mt-1 text-fm-ink">{t.common.buyer(phrase(POOLED_ORDER.buyer, t))}</p>
             <p className="mt-1 text-fm-ink">
-              {POOLED_ORDER.totalPieces} pieces from {POOLED_ORDER.makers.length} makers
+              {t.manufacturer.piecesFrom(POOLED_ORDER.totalPieces, POOLED_ORDER.makers.length)}
             </p>
           </section>
 
           <section className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
-            <h2 className="font-display text-lg font-semibold text-fm-ink">Who made this order</h2>
+            <h2 className="font-display text-lg font-semibold text-fm-ink">{t.manufacturer.whoMade}</h2>
             <ul className="mt-4 flex flex-col gap-4">
               {POOLED_ORDER.makers.map((maker) => {
-                const profile = resolveMaker(maker.id);
+                const profile = resolveMaker(maker.id, t.manufacturer.unknownMaker);
                 const width = (maker.pieces / POOLED_ORDER.totalPieces) * 100;
                 return (
                   <li key={maker.id}>
@@ -179,7 +188,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                         <span className="text-fm-muted">, {profile.village}</span>
                       </p>
                       <p className="shrink-0 text-sm font-semibold text-fm-ink">
-                        {piecesLabel(maker.pieces)}
+                        {t.manufacturer.pieces(maker.pieces)}
                       </p>
                     </div>
                     <div
@@ -198,17 +207,17 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
           </section>
 
           <section className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
-            <h2 className="font-display text-lg font-semibold text-fm-ink">Every piece</h2>
+            <h2 className="font-display text-lg font-semibold text-fm-ink">{t.manufacturer.everyPiece}</h2>
             <ul className="mt-3 grid list-none grid-cols-8 gap-1.5 p-0">
               {POOLED_PIECES.map((piece) => {
-                const maker = resolveMaker(piece.makerId);
+                const maker = resolveMaker(piece.makerId, t.manufacturer.unknownMaker);
                 return (
                   <li key={piece.id}>
                     <button
                       type="button"
                       onClick={() => setOpenPieceId(piece.id)}
                       className={`flex aspect-square w-full items-center justify-center rounded-md text-[11px] font-bold ${makerStyle(piece.makerId).tile}`}
-                      aria-label={`${piece.id}, ${maker.name}, ${maker.village}`}
+                      aria-label={t.manufacturer.pieceAria(piece.id, maker.name, maker.village)}
                     >
                       {piece.id.slice(3)}
                     </button>
@@ -223,29 +232,27 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                     className={`h-3 w-3 rounded-sm ${makerStyle(maker.id).bar}`}
                     aria-hidden
                   />
-                  {resolveMaker(maker.id).name}
+                  {resolveMaker(maker.id, t.manufacturer.unknownMaker).name}
                 </li>
               ))}
             </ul>
           </section>
 
           <section className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
-            <h2 className="font-display text-lg font-semibold text-fm-ink">Shipment</h2>
+            <h2 className="font-display text-lg font-semibold text-fm-ink">{t.manufacturer.shipment}</h2>
             <ul className="mt-3 flex flex-col gap-3">
               {POOLED_ORDER.cartons.map((carton) => (
                 <li key={carton.id}>
-                  <p className="font-semibold text-fm-ink">{carton.id}</p>
-                  <p className="text-sm text-fm-muted">{carton.pieces}</p>
+                  <p className="font-semibold text-fm-ink">{t.manufacturer.cartonNamed(carton.id)}</p>
+                  <p className="text-sm text-fm-muted">{t.manufacturer.range(carton.from, carton.to)}</p>
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-sm leading-snug text-fm-ink">
-              Pieces are pooled into cartons, but each piece keeps its own label and passport.
-            </p>
+            <p className="mt-3 text-sm leading-snug text-fm-ink">{t.manufacturer.pooledNote}</p>
           </section>
 
           <section className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
-            <h2 className="font-display text-lg font-semibold text-fm-ink">Trace a piece</h2>
+            <h2 className="font-display text-lg font-semibold text-fm-ink">{t.manufacturer.traceTitle}</h2>
             <form
               className="mt-3"
               onSubmit={(event) => {
@@ -254,7 +261,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
               }}
             >
               <label htmlFor="trace-piece" className="block text-sm font-medium text-fm-ink">
-                Piece ID
+                {t.manufacturer.pieceId}
               </label>
               <div className="mt-2 flex flex-col gap-3">
                 <input
@@ -263,11 +270,11 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                   value={traceInput}
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder="e.g. CH-23"
+                  placeholder={t.manufacturer.tracePlaceholder}
                   onChange={(event) => {
                     const value = event.target.value;
                     setTraceInput(value);
-                    const match = traceMatch(value);
+                    const match = traceMatch(value, t);
                     if (match) {
                       setTraceFound(true);
                       setTraceMessage(match.text);
@@ -278,7 +285,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                   className="min-h-[48px] w-full rounded-xl border-2 border-slate-200 px-4 text-base text-fm-ink placeholder:text-slate-400 focus:border-fm-blue focus:outline-none"
                 />
                 <button type="submit" className="btn-primary min-h-[48px] font-semibold">
-                  Trace
+                  {t.manufacturer.trace}
                 </button>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -309,12 +316,12 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
           </section>
 
           <section className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
-            <h2 className="font-display text-lg font-semibold text-fm-ink">Materials</h2>
+            <h2 className="font-display text-lg font-semibold text-fm-ink">{t.manufacturer.materials}</h2>
             {draft ? (
               <form onSubmit={saveMaterials} className="mt-3 space-y-3">
                 <div>
                   <label htmlFor="material-yarn" className="block text-sm font-medium text-fm-ink">
-                    Yarn
+                    {t.manufacturer.yarn}
                   </label>
                   <input
                     id="material-yarn"
@@ -328,7 +335,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                     htmlFor="material-yarn-source"
                     className="block text-sm font-medium text-fm-ink"
                   >
-                    Yarn source
+                    {t.manufacturer.yarnSource}
                   </label>
                   <input
                     id="material-yarn-source"
@@ -339,7 +346,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                 </div>
                 <div>
                   <label htmlFor="material-dye" className="block text-sm font-medium text-fm-ink">
-                    Dye
+                    {t.manufacturer.dye}
                   </label>
                   <input
                     id="material-dye"
@@ -349,31 +356,37 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
                   />
                 </div>
                 <button type="submit" className="btn-primary min-h-[48px] w-full font-semibold">
-                  Save
+                  {t.manufacturer.save}
                 </button>
               </form>
             ) : (
               <>
                 <dl className="mt-3 space-y-3">
                   <div>
-                    <dt className="text-sm text-fm-muted">Yarn</dt>
-                    <dd className="text-fm-ink">{materials.yarn}</dd>
+                    <dt className="text-sm text-fm-muted">{t.manufacturer.yarn}</dt>
+                    <dd className="text-fm-ink">{phrase(materials.yarn, t)}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm text-fm-muted">Yarn source</dt>
-                    <dd className="text-fm-ink">{materials.yarnSource}</dd>
+                    <dt className="text-sm text-fm-muted">{t.manufacturer.yarnSource}</dt>
+                    <dd className="text-fm-ink">{phrase(materials.yarnSource, t)}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm text-fm-muted">Dye</dt>
-                    <dd className="text-fm-ink">{materials.dye}</dd>
+                    <dt className="text-sm text-fm-muted">{t.manufacturer.dye}</dt>
+                    <dd className="text-fm-ink">{phrase(materials.dye, t)}</dd>
                   </div>
                 </dl>
                 <button
                   type="button"
-                  onClick={() => setDraft({ ...materials })}
+                  onClick={() =>
+                    setDraft({
+                      yarn: phrase(materials.yarn, t),
+                      yarnSource: phrase(materials.yarnSource, t),
+                      dye: phrase(materials.dye, t),
+                    })
+                  }
                   className="btn-outline mt-4 min-h-[48px] w-full font-semibold"
                 >
-                  Edit
+                  {t.manufacturer.edit}
                 </button>
               </>
             )}
@@ -384,7 +397,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
       {screen === "passport" && selected && (
         <div>
           <label htmlFor="pooled-piece" className="block text-sm font-medium text-fm-ink">
-            Piece
+            {t.manufacturer.piece}
           </label>
           <select
             id="pooled-piece"
@@ -401,7 +414,7 @@ export function ManufacturerExperience({ screen, onScreen }: Props) {
           <div className="mt-4">
             <PassportPanel
               clusterId="chiloe"
-              pieceLine={pieceSummary(selected)}
+              pieceLine={pieceSummary(selected, t)}
               technicalExtra={technicalFor(selected, materials)}
               pooled
             />
@@ -432,10 +445,12 @@ function PieceSheet({
   onClose: () => void;
   onOpenPassport: () => void;
 }) {
+  const t = useT();
+  const format = useFormat();
   const reduce = useReducedMotion();
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
-  const maker = resolveMaker(piece.makerId);
+  const maker = resolveMaker(piece.makerId, t.manufacturer.unknownMaker);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -456,7 +471,7 @@ function PieceSheet({
       <motion.button
         type="button"
         className="absolute inset-0 bg-fm-ink/40"
-        aria-label="Close piece details"
+        aria-label={t.manufacturer.closePiece}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -482,7 +497,7 @@ function PieceSheet({
             type="button"
             onClick={onClose}
             className="flex h-11 min-w-[44px] shrink-0 items-center justify-center rounded-xl text-fm-muted hover:bg-fm-surface hover:text-fm-ink"
-            aria-label="Close"
+            aria-label={t.common.close}
           >
             <span className="text-2xl leading-none" aria-hidden>
               ×
@@ -491,31 +506,31 @@ function PieceSheet({
         </div>
         <dl className="mt-4 space-y-3 text-base">
           <div>
-            <dt className="text-sm text-fm-muted">Maker</dt>
+            <dt className="text-sm text-fm-muted">{t.manufacturer.maker}</dt>
             <dd className="text-fm-ink">
               {maker.name}, {maker.village}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-fm-muted">Artisan ID</dt>
+            <dt className="text-sm text-fm-muted">{t.manufacturer.artisanId}</dt>
             <dd className="text-fm-ink">{maker.id}</dd>
           </div>
           <div>
-            <dt className="text-sm text-fm-muted">Woven date</dt>
-            <dd className="text-fm-ink">{piece.wovenDate}</dd>
+            <dt className="text-sm text-fm-muted">{t.manufacturer.wovenDate}</dt>
+            <dd className="text-fm-ink">{format.dayMonth(piece.wovenDate)}</dd>
           </div>
           <div>
-            <dt className="text-sm text-fm-muted">Carton</dt>
-            <dd className="text-fm-ink">Carton {piece.carton}</dd>
+            <dt className="text-sm text-fm-muted">{t.manufacturer.carton}</dt>
+            <dd className="text-fm-ink">{t.manufacturer.cartonNamed(piece.carton)}</dd>
           </div>
         </dl>
-        <p className="mt-4 text-fm-ink">Recorded by {STEWARD.name}</p>
+        <p className="mt-4 text-fm-ink">{t.common.recordedBy(STEWARD.name)}</p>
         <button
           type="button"
           onClick={onOpenPassport}
           className="btn-primary mt-5 flex min-h-[52px] w-full items-center justify-center text-lg font-semibold"
         >
-          Open this piece&apos;s passport
+          {t.manufacturer.openPassport}
         </button>
       </motion.div>
     </div>

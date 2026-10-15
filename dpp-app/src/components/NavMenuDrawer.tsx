@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useT } from "@/i18n/LanguageProvider";
 import type { AppScreen } from "@/lib/roles";
 
 type MenuScreen = Extract<AppScreen, "story" | "pay" | "whats-live">;
@@ -13,12 +14,7 @@ type Props = {
   activeScreen: AppScreen | null;
 };
 
-const ITEMS: { id: "switch-role" | MenuScreen; title: string }[] = [
-  { id: "switch-role", title: "Switch role" },
-  { id: "story", title: "Artisan's story" },
-  { id: "pay", title: "Pay" },
-  { id: "whats-live", title: "Features" },
-];
+const ITEM_IDS = ["switch-role", "story", "pay", "whats-live"] as const;
 
 export function NavMenuDrawer({
   open,
@@ -27,6 +23,14 @@ export function NavMenuDrawer({
   onOpenScreen,
   activeScreen,
 }: Props) {
+  const t = useT();
+  const titles = {
+    "switch-role": t.nav.switchRole,
+    story: t.nav.story,
+    pay: t.nav.pay,
+    "whats-live": t.nav.features,
+  } as const;
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -63,33 +67,33 @@ export function NavMenuDrawer({
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Main menu"
+        aria-label={t.nav.mainMenu}
         aria-hidden={!open}
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-          <p className="font-display text-lg font-semibold text-fm-blue">Menu</p>
+          <p className="font-display text-lg font-semibold text-fm-blue">{t.nav.menu}</p>
           <button
             type="button"
             onClick={onClose}
             className="flex h-11 min-w-[44px] items-center justify-center rounded-xl text-fm-muted hover:bg-fm-surface hover:text-fm-ink"
-            aria-label="Close menu"
+            aria-label={t.header.closeMenu}
           >
             <span className="text-2xl leading-none" aria-hidden>
               ×
             </span>
           </button>
         </div>
-        <nav className="flex-1 overflow-y-auto px-2 py-3" aria-label="App sections">
+        <nav className="flex-1 overflow-y-auto px-2 py-3" aria-label={t.nav.sections}>
           <ul className="flex flex-col gap-1">
-            {ITEMS.map((item) => {
-              const isActive = item.id !== "switch-role" && activeScreen === item.id;
+            {ITEM_IDS.map((id) => {
+              const isActive = id !== "switch-role" && activeScreen === id;
               return (
-                <li key={item.id}>
+                <li key={id}>
                   <button
                     type="button"
                     onClick={() => {
-                      if (item.id === "switch-role") onSwitchRole();
-                      else onOpenScreen(item.id);
+                      if (id === "switch-role") onSwitchRole();
+                      else onOpenScreen(id);
                     }}
                     className={`w-full min-h-[52px] rounded-xl px-4 py-3 text-left transition-colors ${
                       isActive
@@ -102,7 +106,7 @@ export function NavMenuDrawer({
                         isActive ? "text-fm-btn-text" : "text-fm-ink"
                       }`}
                     >
-                      {item.title}
+                      {titles[id]}
                     </span>
                   </button>
                 </li>

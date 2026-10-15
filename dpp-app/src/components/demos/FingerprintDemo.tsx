@@ -2,26 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CLUSTER_PASSPORTS } from "@/lib/data";
+import { useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
 
 const DONIHUE_PASSPORT = CLUSTER_PASSPORTS.donihue;
 
-const DEFAULT_FIELDS = {
-  product: DONIHUE_PASSPORT.product,
-  material: DONIHUE_PASSPORT.material,
-  origin: DONIHUE_PASSPORT.origin_geo,
-  artisan: DONIHUE_PASSPORT.artisan,
+type FingerprintFields = {
+  product: string;
+  material: string;
+  origin: string;
+  artisan: string;
 };
 
-type FieldKey = keyof typeof DEFAULT_FIELDS;
+type FieldKey = keyof FingerprintFields;
 
-const FIELDS: { key: FieldKey; label: string }[] = [
-  { key: "product", label: "Product" },
-  { key: "material", label: "Material" },
-  { key: "origin", label: "Origin" },
-  { key: "artisan", label: "Artisan" },
+const FIELDS: { key: FieldKey }[] = [
+  { key: "product" },
+  { key: "material" },
+  { key: "origin" },
+  { key: "artisan" },
 ];
 
-function canonical(fields: typeof DEFAULT_FIELDS) {
+function canonical(fields: FingerprintFields) {
   return [fields.product, fields.material, fields.origin, fields.artisan].join("\n");
 }
 
@@ -37,7 +39,14 @@ function shortFingerprint(hex: string) {
 }
 
 export function FingerprintDemo() {
-  const [fields, setFields] = useState(DEFAULT_FIELDS);
+  const t = useT();
+  const defaults = {
+    product: phrase(DONIHUE_PASSPORT.product, t),
+    material: phrase(DONIHUE_PASSPORT.material, t),
+    origin: DONIHUE_PASSPORT.origin_geo,
+    artisan: DONIHUE_PASSPORT.artisan,
+  };
+  const [fields, setFields] = useState(defaults);
   const [saved, setSaved] = useState<{ payload: string; hash: string } | null>(null);
   const [touched, setTouched] = useState(false);
   const [live, setLive] = useState<{ payload: string; hash: string } | null>(null);
@@ -73,7 +82,7 @@ export function FingerprintDemo() {
       setTouched(payloadRef.current !== snapshot);
       setLive(null);
     } catch {
-      setError("This browser could not compute a fingerprint.");
+      setError(t.fingerprint.error);
     } finally {
       setBusy(false);
     }
@@ -92,7 +101,7 @@ export function FingerprintDemo() {
       {FIELDS.map((field) => (
         <div key={field.key}>
           <label htmlFor={`fp-${field.key}`} className="mb-1 block text-sm font-medium text-fm-ink">
-            {field.label}
+            {t.fingerprint[field.key]}
           </label>
           <input
             id={`fp-${field.key}`}
@@ -110,7 +119,7 @@ export function FingerprintDemo() {
         disabled={busy}
         className="btn-primary min-h-[52px] w-full text-lg font-semibold disabled:opacity-60"
       >
-        {busy ? "Creating fingerprint..." : "Create fingerprint"}
+        {busy ? t.fingerprint.creating : t.fingerprint.create}
       </button>
 
       {error && (
@@ -124,7 +133,7 @@ export function FingerprintDemo() {
           <div className={touched ? "grid grid-cols-2 gap-3" : undefined}>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-fm-muted">
-                Saved fingerprint
+                {t.fingerprint.saved}
               </p>
               <p className="mt-1 break-all font-mono text-sm text-fm-ink">
                 {shortFingerprint(saved.hash)}
@@ -133,7 +142,7 @@ export function FingerprintDemo() {
             {touched && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-fm-muted">
-                  Current data fingerprint
+                  {t.fingerprint.current}
                 </p>
                 <p className="mt-1 break-all font-mono text-sm text-fm-ink">
                   {liveReady ? shortFingerprint(live.hash) : "..."}
@@ -143,15 +152,14 @@ export function FingerprintDemo() {
           </div>
           {touched && liveReady && (
             <p className={`text-sm font-semibold ${matches ? "text-fm-green" : "text-red-700"}`}>
-              {matches ? "Matches" : "Does not match. Data was changed."}
+              {matches ? t.fingerprint.matches : t.fingerprint.mismatch}
             </p>
           )}
         </div>
       )}
 
       <p className="text-sm text-fm-muted">
-        The fingerprint is recorded on a public ledger so anyone can check that the
-        passport has not changed.
+        {t.fingerprint.note}
       </p>
     </div>
   );

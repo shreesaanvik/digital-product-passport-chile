@@ -14,6 +14,9 @@ import {
   type RosterStatus,
   type StewardConsent,
 } from "@/lib/data";
+import { todayParts } from "@/lib/format";
+import { useFormat, useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
 import { BackLink } from "./BackLink";
 import { PassportPanel } from "./PassportPanel";
 import { DemoSheet } from "./demos/DemoSheet";
@@ -21,8 +24,6 @@ import { GovIdSyncDemo, type VerifiedGovId } from "./demos/GovIdSyncDemo";
 import { ProofOfHandDemo } from "./demos/ProofOfHandDemo";
 
 const DONIHUE_PATTERN = clusterById("donihue");
-
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 type SyncState = "pending" | "synced";
 
@@ -40,16 +41,6 @@ const STATUS_CLASS: Record<RosterStatus, string> = {
   "Consent pending": "border-slate-300 bg-slate-200 text-slate-600",
 };
 
-function formatDayMonth(date: Date) {
-  return `${date.getDate()} ${MONTHS[date.getMonth()]}`;
-}
-
-function formatEvidenceWhen(date: Date) {
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${formatDayMonth(date)}, ${hours}:${minutes}`;
-}
-
 function copyRoster(): LiveArtisan[] {
   return ROSTER.map((artisan) => ({
     ...artisan,
@@ -65,11 +56,8 @@ function initialLogs(): Record<string, LiveEvidence[]> {
   };
 }
 
-function evidenceCountLabel(count: number) {
-  return count === 1 ? "1 evidence entry" : `${count} evidence entries`;
-}
-
 export function StewardExperience({ screen }: { screen: StewardTab }) {
+  const t = useT();
   const [online, setOnline] = useState(true);
   const [roster, setRoster] = useState<LiveArtisan[]>(copyRoster);
   const [logs, setLogs] = useState<Record<string, LiveEvidence[]>>(initialLogs);
@@ -133,8 +121,9 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
     verified != null && roster.some((artisan) => artisan.id === verified.id);
 
   function recordConsent(id: string) {
+    const now = todayParts();
     const consent: LiveConsent = {
-      date: formatDayMonth(new Date()),
+      date: { day: now.day, month: now.month },
       language: "Spanish",
       ...(online ? {} : { sync: "pending" as const }),
     };
@@ -146,7 +135,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
   function recordEvidence(id: string) {
     const entry: LiveEvidence = {
       stage: "Quality check",
-      date: formatEvidenceWhen(new Date()),
+      date: todayParts(),
       ...(online ? {} : { sync: "pending" as const }),
     };
     setLogs((prev) => ({
@@ -183,7 +172,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
         <div
           className="inline-flex rounded-full border border-slate-200 bg-white p-0.5 text-sm shadow-neu"
           role="group"
-          aria-label="Online or offline"
+          aria-label={t.steward.connection}
         >
           <button
             type="button"
@@ -193,7 +182,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
               online ? "bg-fm-btn-bg text-white" : "text-fm-muted"
             }`}
           >
-            Online
+            {t.steward.online}
           </button>
           <button
             type="button"
@@ -203,7 +192,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
               online ? "text-fm-muted" : "bg-slate-500 text-white"
             }`}
           >
-            Offline
+            {t.steward.offline}
           </button>
         </div>
       </header>
@@ -220,7 +209,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
 
       {screen === "artisans" && !selected && (
         <div>
-          <h1 className="font-display text-2xl font-semibold text-fm-ink">My artisans</h1>
+          <h1 className="font-display text-2xl font-semibold text-fm-ink">{t.steward.myArtisans}</h1>
           <p className="mt-1 text-fm-muted">{STEWARD.area}</p>
           <button
             type="button"
@@ -230,22 +219,22 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
             }}
             className="btn-primary mt-4 min-h-[48px] w-full font-semibold"
           >
-            Add artisan
+            {t.steward.addArtisan}
           </button>
           <label htmlFor="artisan-search" className="mt-4 block text-sm font-medium text-fm-ink">
-            Search by name
+            {t.steward.search}
           </label>
           <input
             id="artisan-search"
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name"
+            placeholder={t.steward.search}
             autoComplete="off"
             className="mt-2 min-h-[48px] w-full rounded-xl border-2 border-slate-200 px-4 text-base text-fm-ink placeholder:text-slate-400 focus:border-fm-blue focus:outline-none"
           />
           {visible.length === 0 ? (
-            <p className="mt-4 text-fm-muted">No artisans match that name.</p>
+            <p className="mt-4 text-fm-muted">{t.steward.noMatch}</p>
           ) : (
             <ul className="mt-4 flex flex-col gap-3">
               {visible.map((artisan) => (
@@ -261,7 +250,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
                       </span>
                       <StatusBadge status={artisan.status} />
                     </span>
-                    <span className="mt-1 block text-sm text-fm-ink">{artisan.craft}</span>
+                    <span className="mt-1 block text-sm text-fm-ink">{phrase(artisan.craft, t)}</span>
                     <span className="block text-sm text-fm-muted">{artisan.village}</span>
                     <span className="mt-1 block text-sm text-fm-muted">{artisan.id}</span>
                   </button>
@@ -279,7 +268,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
             onClick={() => setPassportOpen(false)}
             className="min-h-[44px] text-base font-semibold text-fm-btn-text"
           >
-            Back
+            {t.common.back}
           </button>
           <div className="mt-4">
             <PassportPanel clusterId="donihue" />
@@ -290,10 +279,10 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
       {screen === "passports" && !passportOpen && (
         <div>
           <h1 className="font-display text-2xl font-semibold text-fm-ink">
-            Passports I have recorded
+            {t.steward.passportsTitle}
           </h1>
           {withOrders.length === 0 ? (
-            <p className="mt-4 text-fm-muted">No passports recorded yet.</p>
+            <p className="mt-4 text-fm-muted">{t.steward.noPassports}</p>
           ) : (
             <ul className="mt-4 flex flex-col gap-3">
               {withOrders.map((artisan) => (
@@ -305,19 +294,19 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
                     {artisan.orderCode}
                   </p>
                   <p className="mt-1 text-fm-ink">{artisan.name}</p>
-                  <p className="mt-1 text-fm-ink">{ARTISAN.order.product}</p>
+                  <p className="mt-1 text-fm-ink">{phrase(ARTISAN.order.product, t)}</p>
                   <p className="mt-1 text-fm-ink">
-                    Current stage: {ARTISAN.stages[ARTISAN.currentStage]}
+                    {t.common.currentStage(phrase(ARTISAN.stages[ARTISAN.currentStage], t))}
                   </p>
                   <p className="mt-1 text-sm text-fm-muted">
-                    {evidenceCountLabel(logs[artisan.id]?.length ?? 0)}
+                    {t.steward.evidenceCount(logs[artisan.id]?.length ?? 0)}
                   </p>
                   <button
                     type="button"
                     onClick={() => setPassportOpen(true)}
                     className="btn-outline mt-3 min-h-[48px] w-full font-semibold"
                   >
-                    View passport
+                    {t.steward.viewPassport}
                   </button>
                 </li>
               ))}
@@ -328,7 +317,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
 
       <DemoSheet
         open={addOpen}
-        title="ChileArtesanía registry lookup"
+        title={t.steward.registryTitle}
         onClose={() => {
           setAddOpen(false);
           setVerified(null);
@@ -346,14 +335,14 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
             disabled={verifiedAlready}
             className="btn-primary mt-4 min-h-[52px] w-full text-lg font-semibold disabled:opacity-60"
           >
-            {verifiedAlready ? "Already on my artisans" : "Add to my artisans"}
+            {verifiedAlready ? t.steward.alreadyListed : t.steward.addToList}
           </button>
         )}
       </DemoSheet>
 
       <DemoSheet
         open={proofFor != null}
-        title="Proof of Hand"
+        title={t.steward.proofTitle}
         onClose={() => setProofFor(null)}
         onReset={() => setProofKey((value) => value + 1)}
       >
@@ -381,13 +370,15 @@ function ArtisanDetail({
   onRecordConsent: () => void;
   onRecordProof: () => void;
 }) {
+  const t = useT();
+  const format = useFormat();
   return (
     <div>
       <BackLink onClick={onBack} />
       <div className="mt-2 flex items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold text-fm-ink">{artisan.name}</h1>
-          <p className="mt-1 text-fm-ink">{artisan.craft}</p>
+          <p className="mt-1 text-fm-ink">{phrase(artisan.craft, t)}</p>
           <p className="text-fm-muted">{artisan.village}</p>
           <p className="mt-1 text-sm text-fm-muted">{artisan.id}</p>
         </div>
@@ -395,23 +386,26 @@ function ArtisanDetail({
       </div>
 
       <section className="mt-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-fm-muted">Consent</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-fm-muted">{t.steward.consent}</h2>
         {artisan.consent ? (
           <>
             <p className="mt-2 text-fm-ink">
-              Consent recorded {artisan.consent.date}, in {artisan.consent.language}
+              {t.steward.consentRecorded(
+                format.dayMonth(artisan.consent.date),
+                phrase(artisan.consent.language, t),
+              )}
             </p>
             <SyncBadge sync={artisan.consent.sync} />
           </>
         ) : (
           <>
-            <p className="mt-2 font-semibold text-amber-800">Consent not yet recorded</p>
+            <p className="mt-2 font-semibold text-amber-800">{t.steward.consentMissing}</p>
             <button
               type="button"
               onClick={onRecordConsent}
               className="btn-outline mt-3 min-h-[48px] w-full font-semibold"
             >
-              Record consent
+              {t.steward.recordConsent}
             </button>
           </>
         )}
@@ -420,22 +414,22 @@ function ArtisanDetail({
       {artisan.orderCode && (
         <section className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-fm-muted">
-            Current order
+            {t.steward.currentOrder}
           </h2>
           <p className="mt-2 font-display text-xl font-semibold text-fm-ink">{artisan.orderCode}</p>
-          <p className="mt-1 text-fm-ink">{ARTISAN.order.product}</p>
+          <p className="mt-1 text-fm-ink">{phrase(ARTISAN.order.product, t)}</p>
           <p className="mt-1 text-fm-ink">
-            Current stage: {ARTISAN.stages[ARTISAN.currentStage]}
+            {t.common.currentStage(phrase(ARTISAN.stages[ARTISAN.currentStage], t))}
           </p>
         </section>
       )}
 
       <section className="mt-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-fm-muted">
-          Evidence log
+          {t.steward.evidenceLog}
         </h2>
         {entries.length === 0 ? (
-          <p className="mt-2 text-fm-muted">No evidence recorded yet.</p>
+          <p className="mt-2 text-fm-muted">{t.steward.noEvidence}</p>
         ) : (
           <ol className="mt-3 flex flex-col gap-3">
             {entries.map((entry, index) => (
@@ -445,15 +439,15 @@ function ArtisanDetail({
               >
                 <Image
                   src={DONIHUE_PATTERN.image}
-                  alt={DONIHUE_PATTERN.imageAlt}
+                  alt={phrase(DONIHUE_PATTERN.imageAlt, t)}
                   width={64}
                   height={64}
                   className="h-16 w-16 shrink-0 rounded-lg object-cover"
                 />
                 <div className="min-w-0">
-                  <p className="font-semibold text-fm-ink">{entry.stage}</p>
-                  <p className="text-sm text-fm-ink">{entry.date}</p>
-                  <p className="text-sm text-fm-muted">Recorded by {STEWARD.name}</p>
+                  <p className="font-semibold text-fm-ink">{phrase(entry.stage, t)}</p>
+                  <p className="text-sm text-fm-ink">{format.dayMonthTime(entry.date)}</p>
+                  <p className="text-sm text-fm-muted">{t.common.recordedBy(STEWARD.name)}</p>
                   <p className="text-sm text-fm-muted">{EVIDENCE_GPS}</p>
                   <SyncBadge sync={entry.sync} />
                 </div>
@@ -469,7 +463,7 @@ function ArtisanDetail({
           onClick={onRecordProof}
           className="btn-primary mt-4 flex min-h-[56px] w-full items-center justify-center text-lg font-semibold"
         >
-          Record Proof of Hand
+          {t.steward.recordProof}
         </button>
       )}
     </div>
@@ -477,21 +471,23 @@ function ArtisanDetail({
 }
 
 function StatusBadge({ status }: { status: RosterStatus }) {
+  const t = useT();
   return (
     <span
       className={`inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLASS[status]}`}
     >
-      {status}
+      {phrase(status, t)}
     </span>
   );
 }
 
 function SyncBadge({ sync }: { sync?: SyncState }) {
+  const t = useT();
   if (sync === "pending") {
     return (
       <p className="mt-2">
         <span className="inline-flex rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
-          Saved on phone, waiting to sync
+          {t.steward.savedOnPhone}
         </span>
       </p>
     );
@@ -500,7 +496,7 @@ function SyncBadge({ sync }: { sync?: SyncState }) {
     return (
       <p className="mt-2">
         <span className="inline-flex rounded-full border border-fm-green/25 bg-fm-green-soft px-2.5 py-1 text-xs font-semibold text-fm-green">
-          Synced
+          {t.steward.synced}
         </span>
       </p>
     );

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
 import { SAMPLE_REGISTRY, type SampleRegistryRecord } from "@/lib/data";
 
 type SampleId = SampleRegistryRecord["id"];
@@ -21,11 +23,11 @@ function findRecord(raw: string): SampleRegistryRecord | null {
 
 function placeRows(record: SampleRegistryRecord) {
   if (record.commune === record.region) {
-    return [{ label: "Commune and region", value: record.region }];
+    return [{ id: "communeRegion" as const, value: record.region }];
   }
   return [
-    { label: "Commune", value: record.commune },
-    { label: "Region", value: record.region },
+    { id: "commune" as const, value: record.commune },
+    { id: "region" as const, value: record.region },
   ];
 }
 
@@ -36,6 +38,7 @@ type Props = {
 };
 
 export function GovIdSyncDemo({ onVerified }: Props = {}) {
+  const t = useT();
   const [id, setId] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [profile, setProfile] = useState<SampleRegistryRecord | null>(null);
@@ -86,7 +89,7 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
   return (
     <div className="space-y-4">
       <label htmlFor="gov-artisan-id" className="block text-sm font-medium text-fm-ink">
-        Artisan ID number
+        {t.gov.idLabel}
       </label>
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
@@ -94,7 +97,7 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
           type="text"
           inputMode="text"
           autoComplete="off"
-          placeholder="e.g. CA-06-0412"
+          placeholder={t.gov.placeholder}
           value={id}
           onChange={(event) => {
             setId(event.target.value);
@@ -110,12 +113,12 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
           onClick={() => check(id)}
           className="min-h-[52px] rounded-xl bg-fm-btn-bg px-6 text-lg font-semibold text-white shadow-md hover:bg-fm-btn-text"
         >
-          Check ID
+          {t.gov.check}
         </button>
       </div>
 
       <div>
-        <p className="mb-2 text-sm text-fm-muted">Sample IDs</p>
+        <p className="mb-2 text-sm text-fm-muted">{t.gov.samples}</p>
         <div className="flex flex-wrap gap-2">
           {SAMPLE_REGISTRY.map((record) => (
             <button
@@ -139,13 +142,13 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
             className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-fm-blue/30 border-t-fm-blue motion-reduce:animate-none"
             aria-hidden
           />
-          Checking Registro Nacional de Artesanía
+          {t.gov.checking}
         </p>
       )}
 
       {phase === "missing" && (
         <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800" role="status">
-          No artisan with that number in the sample registry.
+          {t.gov.missing}
         </p>
       )}
 
@@ -161,21 +164,21 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
             <p className="font-display text-xl font-semibold text-fm-ink">{profile.name}</p>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between gap-3">
-                <dt className="text-fm-muted">Craft</dt>
-                <dd className="text-right text-fm-ink">{profile.craft}</dd>
+                <dt className="text-fm-muted">{t.gov.craft}</dt>
+                <dd className="text-right text-fm-ink">{phrase(profile.craft, t)}</dd>
               </div>
               {placeRows(profile).map((row) => (
-                <div key={row.label} className="flex justify-between gap-3">
-                  <dt className="text-fm-muted">{row.label}</dt>
+                <div key={row.id} className="flex justify-between gap-3">
+                  <dt className="text-fm-muted">{t.gov[row.id]}</dt>
                   <dd className="text-right text-fm-ink">{row.value}</dd>
                 </div>
               ))}
               <div className="flex justify-between gap-3">
-                <dt className="text-fm-muted">Registry number</dt>
+                <dt className="text-fm-muted">{t.gov.registryNumber}</dt>
                 <dd className="text-right text-fm-ink">{profile.id}</dd>
               </div>
             </dl>
-            <p className="mt-3 font-semibold text-fm-ink">{profile.status}</p>
+            <p className="mt-3 font-semibold text-fm-ink">{phrase(profile.status, t)}</p>
           </motion.div>
         )}
       </AnimatePresence>

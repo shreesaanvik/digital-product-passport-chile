@@ -2,28 +2,49 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useFormat, useT } from "@/i18n/LanguageProvider";
+import type { Messages } from "@/i18n/messages/es";
 import {
   ARTISAN,
   clusterById,
-  formatClp,
-  formatUsd,
   clpFromUsd,
   MAIN_ORDER,
   MINGLE_PAYOUT_SHARES,
   OLD_PAYOUT_SHARES,
 } from "@/lib/data";
 
-function barColor(label: string, mode: "old" | "new") {
-  if (label === "Artisan") return mode === "new" ? "bg-fm-green" : "bg-fm-orange";
-  if (label === "Exporter") return "bg-slate-500";
-  if (label === "Middlemen") return "bg-fm-pink/80";
-  if (label === "Other costs") return "bg-slate-400";
-  if (label === "Platform fee") return "bg-fm-btn-bg";
-  if (label === "Logistics") return "bg-fm-purple/70";
+function barColor(id: string, mode: "old" | "new") {
+  if (id === "artisan") return mode === "new" ? "bg-fm-green" : "bg-fm-orange";
+  if (id === "exporter") return "bg-slate-500";
+  if (id === "middlemen") return "bg-fm-pink/80";
+  if (id === "other") return "bg-slate-400";
+  if (id === "platform") return "bg-fm-btn-bg";
+  if (id === "logistics") return "bg-fm-purple/70";
   return "bg-slate-400";
 }
 
+function shareLabel(id: string, t: Messages) {
+  switch (id) {
+    case "exporter":
+      return t.pay.exporter;
+    case "middlemen":
+      return t.pay.middlemen;
+    case "other":
+      return t.pay.other;
+    case "artisan":
+      return t.pay.artisan;
+    case "platform":
+      return t.pay.platform;
+    case "logistics":
+      return t.pay.logistics;
+    default:
+      return id;
+  }
+}
+
 export function PayoutToggle() {
+  const t = useT();
+  const format = useFormat();
   const [mode, setMode] = useState<"old" | "new">("new");
   const rows = mode === "old" ? OLD_PAYOUT_SHARES : MINGLE_PAYOUT_SHARES;
   const artisanUsd = MAIN_ORDER.split.artisan.usd;
@@ -38,17 +59,14 @@ export function PayoutToggle() {
         id="payout-heading"
         className="font-display text-xl font-semibold text-fm-blue mb-1"
       >
-        Where the money goes
+        {t.pay.where}
       </h2>
-      <p className="text-fm-muted text-base mb-4">
-        One switch compares old supply chains with Fashion Mingle. Bars show
-        share of each step.
-      </p>
+      <p className="text-fm-muted text-base mb-4">{t.pay.whereBody}</p>
 
       <div
         className="flex rounded-xl bg-slate-100 p-1 mb-6 max-w-md"
         role="group"
-        aria-label="Comparison mode"
+        aria-label={t.pay.comparison}
       >
         <button
           type="button"
@@ -57,7 +75,7 @@ export function PayoutToggle() {
             mode === "old" ? "bg-white text-fm-pink shadow-sm" : "text-fm-muted"
           }`}
         >
-          Old way
+          {t.pay.oldWay}
         </button>
         <button
           type="button"
@@ -66,28 +84,30 @@ export function PayoutToggle() {
             mode === "new" ? "bg-white text-fm-green shadow-sm" : "text-fm-muted"
           }`}
         >
-          Fashion Mingle
+          {t.header.brand}
         </button>
       </div>
 
       <p className="mb-3 font-semibold text-fm-ink">
-        Buyer pays {formatUsd(MAIN_ORDER.buyerPays)}
+        {t.pay.buyerPays(format.usd(MAIN_ORDER.buyerPays))}
       </p>
 
       <div className="space-y-3" role="list">
         {rows.map((row) => (
-          <div key={row.label} className="flex items-center gap-3">
-            <span className="w-28 shrink-0 text-sm text-fm-ink">{row.label}</span>
+          <div key={row.id} className="flex items-center gap-3">
+            <span className="w-36 shrink-0 text-sm leading-tight text-fm-ink">
+              {shareLabel(row.id, t)}
+            </span>
             <div className="flex-1 h-10 rounded-lg bg-slate-100 overflow-hidden">
               <motion.div
                 layout
-                className={`h-full ${barColor(row.label, mode)} rounded-lg`}
+                className={`h-full ${barColor(row.id, mode)} rounded-lg`}
                 initial={false}
                 animate={{ width: `${row.share}%` }}
                 transition={{ type: "spring", stiffness: 120, damping: 20 }}
                 style={{
                   boxShadow:
-                    row.label === "Artisan" && mode === "new"
+                    row.id === "artisan" && mode === "new"
                       ? "0 0 20px rgba(102, 187, 106, 0.45)"
                       : undefined,
                 }}
@@ -101,9 +121,14 @@ export function PayoutToggle() {
       </div>
 
       <div className="mt-6 rounded-xl bg-fm-surface p-4 border border-slate-200">
-        <p className="text-sm text-fm-muted mb-1">Sample order</p>
+        <p className="text-sm text-fm-muted mb-1">{t.pay.sample}</p>
         <p className="text-fm-ink">
-          {`${ARTISAN.name}, ${clusterName}. Artisan receives ${formatUsd(artisanUsd)} (${formatClp(clpFromUsd(artisanUsd))}) on this order.`}
+          {t.pay.sampleLine({
+            name: ARTISAN.name,
+            cluster: clusterName,
+            usd: format.usd(artisanUsd),
+            clp: format.clp(clpFromUsd(artisanUsd)),
+          })}
         </p>
       </div>
     </section>

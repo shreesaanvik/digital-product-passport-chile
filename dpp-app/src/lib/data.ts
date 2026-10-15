@@ -1,3 +1,5 @@
+import type { DayMonth, DayMonthTime } from "@/lib/format";
+
 export const SAMPLE_CLP_PER_USD = 950;
 
 export const PASSPORT_COUNTRY = "CL";
@@ -170,16 +172,13 @@ type Milestone = {
   release: string;
   paymentLabel: string;
   status: "paid" | "waiting";
-  date?: string;
+  date?: DayMonth;
 };
 
 export const MAIN_ORDER = {
   code: "FM-DON-2026",
   buyer: "Maren Voss studio, New York",
   product: "Double-sided Doñihue chamanto",
-  routeFrom: "Doñihue, Chile",
-  routeTo: "New York, USA",
-  dutyNote: "US-Chile Free Trade Agreement, subject to rules of origin",
   buyerPays: 625,
   split: {
     artisan: { usd: 500, share: 80 },
@@ -192,7 +191,7 @@ export const MAIN_ORDER = {
       release: "Weaving done",
       paymentLabel: "Order started",
       status: "paid",
-      date: "12 Sep",
+      date: { day: 12, month: 9 },
     },
     {
       usd: 200,
@@ -210,41 +209,41 @@ export const MAIN_ORDER = {
 };
 
 export const OLD_PAYOUT_SHARES = [
-  { label: "Exporter", share: 40 },
-  { label: "Middlemen", share: 30 },
-  { label: "Other costs", share: 15 },
-  { label: "Artisan", share: 15 },
+  { id: "exporter", share: 40 },
+  { id: "middlemen", share: 30 },
+  { id: "other", share: 15 },
+  { id: "artisan", share: 15 },
 ] as const;
 
 export const MINGLE_PAYOUT_SHARES = [
-  { label: "Platform fee", share: MAIN_ORDER.split.platformFee.share },
-  { label: "Logistics", share: MAIN_ORDER.split.logistics.share },
-  { label: "Artisan", share: MAIN_ORDER.split.artisan.share },
+  { id: "platform", share: MAIN_ORDER.split.platformFee.share },
+  { id: "logistics", share: MAIN_ORDER.split.logistics.share },
+  { id: "artisan", share: MAIN_ORDER.split.artisan.share },
 ] as const;
 
 export const LANDED_COST_LINES = [
   {
-    label: "Artisan payout",
+    id: "artisan",
     amount: MAIN_ORDER.split.artisan.usd,
-    note: "Paid on this order",
+    note: "paidOnOrder",
     prominent: true,
   },
   {
-    label: "Shipping",
+    id: "shipping",
     amount: MAIN_ORDER.split.logistics.shipping,
-    note: "Negotiated DHL / Correos de Chile rate",
+    note: "shippingRate",
     prominent: false,
   },
   {
-    label: "Import duty",
+    id: "duty",
     amount: MAIN_ORDER.split.logistics.importDuty,
-    note: MAIN_ORDER.dutyNote,
+    note: "dutyNote",
     prominent: false,
   },
   {
-    label: "Platform fee",
+    id: "platform",
     amount: MAIN_ORDER.split.platformFee.usd,
-    note: "Connects supply & compliance",
+    note: "platformNote",
     prominent: false,
   },
 ] as const;
@@ -253,7 +252,7 @@ export type ArtisanPayment = {
   label: string;
   amount: number;
   status: "paid" | "waiting";
-  date?: string;
+  date?: DayMonth;
 };
 
 export const ARTISAN = {
@@ -264,8 +263,8 @@ export const ARTISAN = {
   registryId: "CA-06-0412",
   steward: {
     name: "Camila Araya",
-    role: "Gestora territorial, O'Higgins",
-    lastVisit: "28 Sep",
+    area: "O'Higgins",
+    lastVisit: { day: 28, month: 9 },
   },
   order: {
     code: MAIN_ORDER.code,
@@ -314,14 +313,13 @@ export type SampleRegistryRecord = (typeof SAMPLE_REGISTRY)[number];
 
 export const STEWARD = {
   name: "Camila Araya",
-  role: "Gestora territorial",
   area: "O'Higgins",
 } as const;
 
 export type RosterStatus = "Verified" | "Needs visit" | "Consent pending";
 
 export type StewardConsent = {
-  date: string;
+  date: DayMonth;
   language: string;
 };
 
@@ -342,7 +340,7 @@ export const ROSTER: RosterArtisan[] = [
     craft: "Chamantos y mantas",
     village: "Doñihue",
     status: "Verified",
-    consent: { date: "2 Sep", language: "Spanish" },
+    consent: { date: { day: 2, month: 9 }, language: "Spanish" },
     orderCode: MAIN_ORDER.code,
   },
   {
@@ -351,7 +349,7 @@ export const ROSTER: RosterArtisan[] = [
     craft: "Chamantos y mantas",
     village: "Doñihue",
     status: "Verified",
-    consent: { date: "3 Sep", language: "Spanish" },
+    consent: { date: { day: 3, month: 9 }, language: "Spanish" },
     orderCode: null,
   },
   {
@@ -360,7 +358,7 @@ export const ROSTER: RosterArtisan[] = [
     craft: "Mantas",
     village: "Coltauco",
     status: "Needs visit",
-    consent: { date: "20 Aug", language: "Spanish" },
+    consent: { date: { day: 20, month: 8 }, language: "Spanish" },
     orderCode: null,
   },
   {
@@ -378,7 +376,7 @@ export const ROSTER: RosterArtisan[] = [
     craft: "Embroidery",
     village: "Rancagua",
     status: "Verified",
-    consent: { date: "5 Sep", language: "Spanish" },
+    consent: { date: { day: 5, month: 9 }, language: "Spanish" },
     orderCode: null,
   },
 ];
@@ -399,7 +397,7 @@ export type PooledPiece = {
   id: string;
   makerId: string;
   carton: "A" | "B";
-  wovenDate: string;
+  wovenDate: DayMonth;
   recordedBy: string;
 };
 
@@ -411,9 +409,9 @@ const POOLED_MAKERS = [
   { id: "CA-10-0320", name: "Teresa Vargas", village: "Chonchi", pieces: 7 },
 ] as const;
 
-function wovenDateForIndex(index: number): string {
+function wovenDateForIndex(index: number): DayMonth {
   const day = 1 + Math.round((index * 24) / 39);
-  return `${day} Sep`;
+  return { day, month: 9 };
 }
 
 function buildPooledPieces(): PooledPiece[] {
@@ -449,8 +447,8 @@ export const POOLED_ORDER = {
   } satisfies PooledMaterials,
   makers: POOLED_MAKERS,
   cartons: [
-    { id: "Carton A", pieces: "CH-01 to CH-20" },
-    { id: "Carton B", pieces: "CH-21 to CH-40" },
+    { id: "A", from: "CH-01", to: "CH-20" },
+    { id: "B", from: "CH-21", to: "CH-40" },
   ],
 } as const;
 
@@ -464,32 +462,17 @@ export const POOLED_PASSPORT = {
 
 export type EvidenceEntry = {
   stage: string;
-  date: string;
+  date: DayMonthTime;
 };
 
 export const EVIDENCE_GPS = "34.23 S, 70.97 W (Doñihue)";
 
 export const EVIDENCE_LOG: EvidenceEntry[] = [
-  { stage: "Thread preparation", date: "12 Sep, 10:14" },
-  { stage: "Weaving", date: "18 Sep, 11:02" },
-  { stage: "Finishing", date: "24 Sep, 09:40" },
-  { stage: "Quality check started", date: "28 Sep, 15:25" },
+  { stage: "Thread preparation", date: { day: 12, month: 9, hour: 10, minute: 14 } },
+  { stage: "Weaving", date: { day: 18, month: 9, hour: 11, minute: 2 } },
+  { stage: "Finishing", date: { day: 24, month: 9, hour: 9, minute: 40 } },
+  { stage: "Quality check started", date: { day: 28, month: 9, hour: 15, minute: 25 } },
 ];
-
-export function formatClp(amount: number): string {
-  const grouped = new Intl.NumberFormat("es-CL", {
-    maximumFractionDigits: 0,
-  }).format(Math.round(amount));
-  return `$${grouped} CLP`;
-}
-
-export function formatUsd(amount: number): string {
-  const grouped = amount.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  return `US$${grouped}`;
-}
 
 export function passportJsonLd(input: {
   product: string;
@@ -522,9 +505,17 @@ export function artisanPaymentTotals(payments: readonly ArtisanPayment[]) {
   return { received, waiting };
 }
 
-export function artisanPaymentStatus(payment: ArtisanPayment): string {
-  if (payment.status === "paid") return payment.date ? `Paid ${payment.date}` : "Paid";
-  if (payment.label === "After quality check") return "When quality check is done";
-  if (payment.label === "After shipping") return "When shipped";
-  return "Waiting";
+export type PaymentProgress =
+  | { kind: "paid"; date?: DayMonth }
+  | { kind: "afterQuality" }
+  | { kind: "afterShipping" }
+  | { kind: "waiting" };
+
+export function paymentProgress(payment: ArtisanPayment): PaymentProgress {
+  if (payment.status === "paid") {
+    return payment.date ? { kind: "paid", date: payment.date } : { kind: "paid" };
+  }
+  if (payment.label === "After quality check") return { kind: "afterQuality" };
+  if (payment.label === "After shipping") return { kind: "afterShipping" };
+  return { kind: "waiting" };
 }

@@ -2,13 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ESPR_SAMPLE_FIELDS } from "./esprFields";
+import { useT } from "@/i18n/LanguageProvider";
+import type { Messages } from "@/i18n/messages/es";
+import { ESPR_SAMPLE_FIELDS, type EsprFieldId } from "./esprFields";
 
 type RowState = "pending" | "present" | "missing";
 
 const MISSING_COUNT = ESPR_SAMPLE_FIELDS.filter((field) => !field.present).length;
 
+function fieldLabel(id: EsprFieldId, t: Messages) {
+  return t.espr[id];
+}
+
 export function EsprCheckDemo() {
+  const t = useT();
   const [running, setRunning] = useState(false);
   const [revealed, setRevealed] = useState(0);
   const [finished, setFinished] = useState(false);
@@ -40,12 +47,12 @@ export function EsprCheckDemo() {
 
   return (
     <div className="space-y-4">
-      <ul className="space-y-2" aria-label="ESPR fields">
+      <ul className="space-y-2" aria-label={t.espr.fieldsLabel}>
         {ESPR_SAMPLE_FIELDS.map((field, index) => {
           const state = rowState(index, field.present);
           return (
             <li
-              key={field.label}
+              key={field.id}
               className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-3 py-2"
             >
               <span
@@ -70,9 +77,9 @@ export function EsprCheckDemo() {
                   </motion.span>
                 )}
               </span>
-              <span className="text-fm-ink">{field.label}</span>
+              <span className="text-fm-ink">{fieldLabel(field.id, t)}</span>
               <span className="sr-only">
-                {state === "present" ? "Present" : state === "missing" ? "Missing" : "Waiting"}
+                {state === "present" ? t.espr.present : state === "missing" ? t.espr.missing : t.espr.waiting}
               </span>
             </li>
           );
@@ -85,14 +92,12 @@ export function EsprCheckDemo() {
         disabled={running}
         className="btn-primary min-h-[52px] w-full text-lg font-semibold disabled:opacity-60"
       >
-        Run check
+        {t.espr.run}
       </button>
 
       {finished && !filled && (
         <p className="text-sm font-semibold text-red-700" role="status">
-          {MISSING_COUNT === 1
-            ? "1 required field missing. Product would be held before shipping."
-            : `${MISSING_COUNT} required fields missing. Product would be held before shipping.`}
+          {t.espr.missingRequired(MISSING_COUNT)}
         </p>
       )}
 
@@ -102,19 +107,18 @@ export function EsprCheckDemo() {
           onClick={() => setFilled(true)}
           className="btn-outline min-h-[52px] w-full font-semibold"
         >
-          Fill missing fields
+          {t.espr.fill}
         </button>
       )}
 
       {filled && (
         <p className="text-sm font-semibold text-fm-green" role="status">
-          Ready to ship
+          {t.espr.ready}
         </p>
       )}
 
       <p className="text-sm text-fm-muted">
-        Final textile requirements under ESPR are still being set by the EU. This
-        check applies to textile passports.
+        {t.espr.note}
       </p>
     </div>
   );

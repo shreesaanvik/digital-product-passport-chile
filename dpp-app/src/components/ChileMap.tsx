@@ -10,6 +10,8 @@ import {
   Tooltip,
   useMap,
 } from "react-leaflet";
+import { useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
 import { CLUSTERS, type ClusterId } from "@/lib/data";
 
 import "leaflet/dist/leaflet.css";
@@ -98,6 +100,7 @@ function pinClasses(
 }
 
 export function ChileMap({ selectedId, onSelect, matchedIds = null }: Props) {
+  const t = useT();
   const bounds = useMemo(() => {
     const pts = CLUSTERS.map((c) => L.latLng(c.lat, c.lng));
     return L.latLngBounds(pts);
@@ -107,7 +110,7 @@ export function ChileMap({ selectedId, onSelect, matchedIds = null }: Props) {
     <div
       className="relative h-[420px] w-full rounded-2xl bg-slate-100 shadow-neu overflow-hidden border border-slate-200/80 z-0"
       role="application"
-      aria-label="Map of Chile with heritage craft clusters. Tap a marker to select."
+      aria-label={t.home.mapLabel}
     >
       <MapContainer
         bounds={bounds}
@@ -188,13 +191,13 @@ export function ChileMap({ selectedId, onSelect, matchedIds = null }: Props) {
                   <span className="block w-40">
                     <Image
                       src={c.image}
-                      alt={c.imageAlt}
+                      alt={phrase(c.imageAlt, t)}
                       width={160}
                       height={80}
                       className="h-20 w-40 rounded object-cover"
                     />
                     <span className="mt-1 block text-center text-xs leading-snug">
-                      {c.name}, {c.craft}
+                      {c.name}, {phrase(c.craft, t)}
                     </span>
                   </span>
                 </Tooltip>
@@ -204,7 +207,7 @@ export function ChileMap({ selectedId, onSelect, matchedIds = null }: Props) {
         })}
       </MapContainer>
       <p className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-xs text-fm-muted px-2 bg-white/85 backdrop-blur-sm py-1.5 border-t border-slate-100">
-        OpenStreetMap · Tap a dot. Glowing blue is selected.
+        {t.home.mapHint}
       </p>
     </div>
   );

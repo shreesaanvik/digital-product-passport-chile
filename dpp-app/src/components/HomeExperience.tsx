@@ -7,6 +7,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AppHeader } from "./AppHeader";
 import { BottomNav } from "./BottomNav";
 import { CLUSTERS, type ClusterId } from "@/lib/data";
+import { useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
 import {
   BOTTOM_TABS,
   ROLE_PROFILES,
@@ -31,27 +33,34 @@ const ChileMap = dynamic(
   () => import("./ChileMap").then((m) => m.ChileMap),
   {
     ssr: false,
-    loading: () => (
-      <div
-        className="relative h-[420px] w-full rounded-2xl bg-gradient-to-b from-slate-100 to-white shadow-neu border border-slate-200/80 flex items-center justify-center text-fm-muted text-sm"
-        role="status"
-        aria-live="polite"
-      >
-        Loading map…
-      </div>
-    ),
+    loading: () => <MapLoading />,
   },
 );
 
+function MapLoading() {
+  const t = useT();
+  return (
+    <div
+      className="relative h-[420px] w-full rounded-2xl bg-gradient-to-b from-slate-100 to-white shadow-neu border border-slate-200/80 flex items-center justify-center text-fm-muted text-sm"
+      role="status"
+      aria-live="polite"
+    >
+      {t.home.loadingMap}
+    </div>
+  );
+}
+
 function BuiltLater() {
+  const t = useT();
   return (
     <p className="rounded-2xl border border-slate-100 bg-white p-6 text-center text-fm-ink shadow-neu">
-      This view is being built
+      {t.home.builtLater}
     </p>
   );
 }
 
 export function HomeExperience() {
+  const t = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
   const roleParam = searchParams.get("role");
@@ -107,7 +116,7 @@ export function HomeExperience() {
         menuOpen={menuOpen}
         onMenuClick={() => setMenuOpen((open) => !open)}
         initial={profile.initial}
-        tooltip={roleTooltip(role)}
+        tooltip={roleTooltip(role, t)}
       />
 
       <NavMenuDrawer
@@ -137,7 +146,7 @@ export function HomeExperience() {
                 <div className="relative h-[120px] w-full">
                   <Image
                     src={cluster.image}
-                    alt={cluster.imageAlt}
+                    alt={phrase(cluster.imageAlt, t)}
                     fill
                     sizes="(max-width: 512px) 100vw, 512px"
                     className="rounded-t-2xl object-cover"
@@ -146,10 +155,10 @@ export function HomeExperience() {
                 <div className="p-4">
                   <p className="font-display text-xl font-semibold text-fm-ink">{cluster.name}</p>
                   <p className="text-fm-muted">{cluster.region}</p>
-                  <p className="text-fm-muted">{cluster.craft}</p>
+                  <p className="text-fm-muted">{phrase(cluster.craft, t)}</p>
                   <p className="mt-2 text-fm-ink">
-                    <strong>{cluster.orders}</strong> active orders ·{" "}
-                    <strong>{cluster.artisans}</strong> artisans
+                    <strong>{cluster.orders}</strong> {t.home.orders} ·{" "}
+                    <strong>{cluster.artisans}</strong> {t.home.artisans}
                   </p>
                 </div>
               </div>
@@ -159,7 +168,7 @@ export function HomeExperience() {
               onClick={() => setScreen("passport")}
               className="btn-primary mt-4 w-full min-h-[52px] text-lg font-semibold"
             >
-              See a product passport
+              {t.home.seePassport}
             </button>
           </>
         )}

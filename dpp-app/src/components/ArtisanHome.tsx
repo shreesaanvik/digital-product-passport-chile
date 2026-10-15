@@ -4,11 +4,14 @@ import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   ARTISAN,
-  artisanPaymentStatus,
   artisanPaymentTotals,
   clusterById,
-  formatClp,
+  paymentProgress,
+  type ArtisanPayment,
 } from "@/lib/data";
+import { useFormat, useT } from "@/i18n/LanguageProvider";
+import { phrase } from "@/i18n/labels";
+import type { Messages } from "@/i18n/messages/es";
 import { BackLink } from "./BackLink";
 import { PassportPanel } from "./PassportPanel";
 
@@ -19,12 +22,33 @@ const largeButtonClass =
 
 export type ArtisanPanel = "home" | "work" | "money" | "passport" | "steward";
 
-const TILES: { id: Exclude<ArtisanPanel, "home">; label: string }[] = [
-  { id: "work", label: "My work" },
-  { id: "money", label: "My money" },
-  { id: "passport", label: "My passport" },
-  { id: "steward", label: "My steward" },
+const TILES: { id: Exclude<ArtisanPanel, "home"> }[] = [
+  { id: "work" },
+  { id: "money" },
+  { id: "passport" },
+  { id: "steward" },
 ];
+
+function tileLabel(id: (typeof TILES)[number]["id"], t: Messages) {
+  if (id === "work") return t.artisan.work;
+  if (id === "money") return t.artisan.money;
+  if (id === "passport") return t.artisan.passport;
+  return t.artisan.steward;
+}
+
+function paymentStatusText(
+  payment: ArtisanPayment,
+  t: Messages,
+  dayMonth: (date: { day: number; month: number }) => string,
+) {
+  const progress = paymentProgress(payment);
+  if (progress.kind === "paid") {
+    return progress.date ? t.artisan.paidOn(dayMonth(progress.date)) : t.artisan.paid;
+  }
+  if (progress.kind === "afterQuality") return t.artisan.whenQuality;
+  if (progress.kind === "afterShipping") return t.artisan.whenShipped;
+  return t.artisan.waiting;
+}
 
 type Props = {
   panel: ArtisanPanel;
@@ -32,6 +56,7 @@ type Props = {
 };
 
 export function ArtisanHome({ panel, onPanel }: Props) {
+  const t = useT();
   const back = () => onPanel("home");
 
   if (panel === "work") return <WorkDetail onBack={back} />;
@@ -44,7 +69,7 @@ export function ArtisanHome({ panel, onPanel }: Props) {
   return (
     <div className="text-lg text-fm-ink">
       <h1 className="font-display text-2xl font-semibold leading-tight text-fm-ink">
-        Hola, {firstName}
+        {t.artisan.hello(firstName)}
       </h1>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {TILES.map((tile) => (
@@ -56,7 +81,7 @@ export function ArtisanHome({ panel, onPanel }: Props) {
           >
             <TileIcon id={tile.id} />
             <span className="font-display text-2xl font-semibold leading-tight">
-              {tile.label}
+              {tileLabel(tile.id, t)}
             </span>
           </button>
         ))}
@@ -75,13 +100,14 @@ export function ArtisanHero({
   subtitle: string;
   titleAs?: "h1" | "p";
 }) {
+  const t = useT();
   const TitleTag = titleAs;
 
   return (
     <div className="relative h-64 w-full overflow-hidden rounded-2xl">
       <Image
         src={DONIHUE_PATTERN.image}
-        alt={DONIHUE_PATTERN.imageAlt}
+        alt={phrase(DONIHUE_PATTERN.imageAlt, t)}
         fill
         sizes="(max-width: 512px) 100vw, 512px"
         className="object-cover object-center"
@@ -102,6 +128,8 @@ export function ArtisanHero({
 }
 
 export function ArtisanMoneyPanel() {
+  const t = useT();
+  const format = useFormat();
   const totals = artisanPaymentTotals(ARTISAN.payments);
 
   return (
@@ -114,18 +142,18 @@ export function ArtisanMoneyPanel() {
           >
             <CheckIcon />
           </span>
-          <p className="font-semibold">Received</p>
+          <p className="font-semibold">{t.artisan.received}</p>
           <p className="font-display text-2xl font-semibold leading-tight">
-            {formatClp(totals.received)}
+            {format.clp(totals.received)}
           </p>
         </div>
         <div className="flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center shadow-neu">
           <span className="flex h-12 w-12 items-center justify-center text-fm-blue" aria-hidden>
             <ClockIcon />
           </span>
-          <p className="font-semibold">Waiting</p>
+          <p className="font-semibold">{t.artisan.waiting}</p>
           <p className="font-display text-2xl font-semibold leading-tight">
-            {formatClp(totals.waiting)}
+            {format.clp(totals.waiting)}
           </p>
         </div>
       </div>
@@ -136,11 +164,11 @@ export function ArtisanMoneyPanel() {
             className="flex min-h-[56px] items-center justify-between gap-3 py-3"
           >
             <div>
-              <p className="font-semibold text-fm-ink">{payment.label}</p>
-              <p className="text-fm-ink">{artisanPaymentStatus(payment)}</p>
+              <p className="font-semibold text-fm-ink">{phrase(payment.label, t)}</p>
+              <p className="text-fm-ink">{paymentStatusText(payment, t, format.dayMonth)}</p>
             </div>
             <p className="shrink-0 font-display text-xl font-semibold text-fm-ink">
-              {formatClp(payment.amount)}
+              {format.clp(payment.amount)}
             </p>
           </li>
         ))}
@@ -168,18 +196,20 @@ function DetailShell({
 }
 
 function OrderProgress({ onOpen }: { onOpen: () => void }) {
+  const t = useT();
   const current = ARTISAN.currentStage;
   const last = ARTISAN.stages.length - 1;
 
   return (
     <section className="mt-4" aria-labelledby="artisan-order-heading">
       <h2 id="artisan-order-heading" className="text-lg font-semibold text-fm-ink">
-        Your order
+        {t.artisan.yourOrder}
       </h2>
       <div className="relative mt-3 w-[calc(100%+2rem)] -mx-4">
         <ol className="grid w-full grid-cols-5">
           {ARTISAN.stages.map((stage, index) => {
             const state = index < current ? "done" : index === current ? "now" : "later";
+            const label = phrase(stage, t);
             return (
               <li
                 key={stage}
@@ -189,7 +219,7 @@ function OrderProgress({ onOpen }: { onOpen: () => void }) {
                 <div className="flex h-4 items-end justify-center">
                   {state === "now" ? (
                     <span className="text-[12px] font-semibold leading-none text-fm-blue" aria-hidden>
-                      Now
+                      {t.artisan.now}
                     </span>
                   ) : null}
                 </div>
@@ -221,9 +251,9 @@ function OrderProgress({ onOpen }: { onOpen: () => void }) {
                   }`}
                 >
                   <span className="sr-only">
-                    {state === "done" ? "Done. " : state === "now" ? "Now. " : "Later. "}
+                    {state === "done" ? `${t.artisan.done}. ` : state === "now" ? `${t.artisan.now}. ` : `${t.artisan.later}. `}
                   </span>
-                  {stage}
+                  {label}
                 </p>
               </li>
             );
@@ -233,7 +263,7 @@ function OrderProgress({ onOpen }: { onOpen: () => void }) {
           type="button"
           onClick={onOpen}
           className="absolute inset-0"
-          aria-label="Open My work"
+          aria-label={t.artisan.openWork}
         />
       </div>
     </section>
@@ -266,14 +296,15 @@ function ProgressDot({ state }: { state: "done" | "now" | "later" }) {
 }
 
 function WorkDetail({ onBack }: { onBack: () => void }) {
+  const t = useT();
   return (
-    <DetailShell title="My work" onBack={onBack}>
+    <DetailShell title={t.artisan.work} onBack={onBack}>
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-neu">
         <p className="font-display text-2xl font-semibold text-fm-ink">{ARTISAN.order.code}</p>
-        <p className="mt-2 text-lg text-fm-ink">{ARTISAN.order.product}</p>
-        <p className="mt-1 text-lg text-fm-ink">Buyer: {ARTISAN.order.buyer}</p>
+        <p className="mt-2 text-lg text-fm-ink">{phrase(ARTISAN.order.product, t)}</p>
+        <p className="mt-1 text-lg text-fm-ink">{t.common.buyer(phrase(ARTISAN.order.buyer, t))}</p>
       </div>
-      <ol className="mt-4 space-y-2" aria-label="Order stages">
+      <ol className="mt-4 space-y-2" aria-label={t.artisan.orderStages}>
         {ARTISAN.stages.map((stage, index) => {
           const state =
             index < ARTISAN.currentStage ? "done" : index === ARTISAN.currentStage ? "now" : "later";
@@ -290,12 +321,12 @@ function WorkDetail({ onBack }: { onBack: () => void }) {
                   state === "later" ? "text-slate-500" : "font-semibold text-fm-ink"
                 }`}
               >
-                {state === "done" && <span className="sr-only">Done. </span>}
-                {stage}
+                {state === "done" && <span className="sr-only">{t.artisan.done}. </span>}
+                {phrase(stage, t)}
               </span>
               {state === "now" && (
                 <span className="shrink-0 rounded-full bg-fm-btn-bg px-3 py-1 text-base font-semibold text-white">
-                  Now
+                  {t.artisan.now}
                 </span>
               )}
             </li>
@@ -307,30 +338,32 @@ function WorkDetail({ onBack }: { onBack: () => void }) {
 }
 
 function MoneyDetail({ onBack }: { onBack: () => void }) {
+  const t = useT();
   return (
-    <DetailShell title="My money" onBack={onBack}>
+    <DetailShell title={t.artisan.money} onBack={onBack}>
       <ArtisanMoneyPanel />
     </DetailShell>
   );
 }
 
 function PassportDetail({ onBack }: { onBack: () => void }) {
+  const t = useT();
   const [showFull, setShowFull] = useState(false);
 
   return (
-    <DetailShell title="My passport" onBack={onBack}>
+    <DetailShell title={t.artisan.passport} onBack={onBack}>
       <ArtisanHero
         title={ARTISAN.name}
-        subtitle={`${ARTISAN.craft}, ${ARTISAN.cluster}`}
+        subtitle={`${phrase(ARTISAN.craft, t)}, ${ARTISAN.cluster}`}
       />
-      <p className="mt-4 text-lg text-fm-ink">Buyers who scan the label see this</p>
+      <p className="mt-4 text-lg text-fm-ink">{t.artisan.buyersSee}</p>
       <button
         type="button"
         onClick={() => setShowFull(true)}
         className={`${largeButtonClass} mt-4`}
         aria-expanded={showFull}
       >
-        See full passport
+        {t.artisan.seeFull}
       </button>
       {showFull && (
         <div className="mt-4">
@@ -342,6 +375,8 @@ function PassportDetail({ onBack }: { onBack: () => void }) {
 }
 
 function StewardDetail({ onBack }: { onBack: () => void }) {
+  const t = useT();
+  const format = useFormat();
   const [callId, setCallId] = useState(0);
   const stewardFirst = ARTISAN.steward.name.split(" ")[0];
 
@@ -352,7 +387,7 @@ function StewardDetail({ onBack }: { onBack: () => void }) {
   }, [callId]);
 
   return (
-    <DetailShell title="My steward" onBack={onBack}>
+    <DetailShell title={t.artisan.steward} onBack={onBack}>
       <div className="flex items-center gap-4">
         <div
           className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-fm-blue font-display text-4xl font-bold text-white"
@@ -364,8 +399,10 @@ function StewardDetail({ onBack }: { onBack: () => void }) {
           <p className="font-display text-2xl font-semibold leading-tight text-fm-ink">
             {ARTISAN.steward.name}
           </p>
-          <p className="mt-1 text-lg text-fm-ink">{ARTISAN.steward.role}</p>
-          <p className="mt-1 text-lg text-fm-ink">Last visit: {ARTISAN.steward.lastVisit}</p>
+          <p className="mt-1 text-lg text-fm-ink">{t.roles.stewardWithArea(ARTISAN.steward.area)}</p>
+          <p className="mt-1 text-lg text-fm-ink">
+            {t.artisan.lastVisit(format.dayMonth(ARTISAN.steward.lastVisit))}
+          </p>
         </div>
       </div>
       <button
@@ -373,10 +410,10 @@ function StewardDetail({ onBack }: { onBack: () => void }) {
         onClick={() => setCallId((id) => id + 1)}
         className={`${largeButtonClass} mt-6`}
       >
-        Call {stewardFirst}
+        {t.artisan.call(stewardFirst)}
       </button>
       <p className="mt-3 min-h-[1.75rem] text-lg font-semibold text-fm-ink" role="status">
-        {callId > 0 ? `Calling ${ARTISAN.steward.name}...` : ""}
+        {callId > 0 ? t.artisan.calling(ARTISAN.steward.name) : ""}
       </p>
     </DetailShell>
   );

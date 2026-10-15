@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useT } from "@/i18n/LanguageProvider";
 
 type Props = {
   open: boolean;
@@ -21,6 +22,7 @@ const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export function DemoSheet({ open, title, onClose, onReset, children }: Props) {
+  const t = useT();
   const reduce = useReducedMotion();
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -101,14 +103,14 @@ export function DemoSheet({ open, title, onClose, onReset, children }: Props) {
                 {title}
               </h2>
               <button type="button" onClick={onReset} className="btn-light min-h-[44px] shrink-0">
-                Reset
+                {t.common.reset}
               </button>
               <button
                 ref={closeRef}
                 type="button"
                 onClick={onClose}
                 className="flex h-11 min-w-[44px] shrink-0 items-center justify-center rounded-xl text-fm-muted hover:bg-fm-surface hover:text-fm-ink"
-                aria-label="Close"
+                aria-label={t.common.close}
               >
                 <span className="text-2xl leading-none" aria-hidden>
                   ×

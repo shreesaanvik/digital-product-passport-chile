@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Outfit } from "next/font/google";
+import { es } from "@/i18n/messages/es";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -15,9 +16,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Fashion Mingle: Digital Product Passport",
-  description:
-    "Trace heritage crafts from loom to label. Simple tools for artisans, stewards, and global partners.",
+  title: es.meta.title,
+  description: es.meta.description,
 };
 
 export const viewport: Viewport = {
@@ -32,8 +32,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${outfit.variable}`}>
-      <body className="font-sans min-h-dvh">{children}</body>
+    <html lang="es-CL" className={`${dmSans.variable} ${outfit.variable}`}>
+      <body className="font-sans min-h-dvh">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var q=new URLSearchParams(location.search).get("lang");document.documentElement.lang=q==="en"?"en":"es-CL";}catch(e){}})();`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
