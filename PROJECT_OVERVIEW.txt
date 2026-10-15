@@ -1,0 +1,48 @@
+Fashion Mingle: Digital Product Passport, Chile demo
+
+This is a clickable demo of a digital product passport for Chilean heritage crafts. It shows how a piece can be followed from the maker to the label: who made it, where it comes from, which production stage it is in, and how payment is split. The app is a sample for conversations with Chilean partners. Payments, registry lookups, and government checks in the demo are simulated.
+
+Every person, cooperative, order code, registry number, date, and amount in the demo is invented sample data.
+
+How to run it
+
+Open a terminal in the dpp-app folder.
+
+  npm install
+  npm run dev
+
+Then open http://localhost:3334
+
+The dev server uses port 3334.
+
+Language
+
+The demo opens in Spanish. At the top of the screen, next to the Demo label, there is an ES | EN control. ES is Spanish (the default). EN is English. Choosing EN adds lang=en to the page address. Choosing ES removes it.
+
+Five roles
+
+The first screen is Explore as. Pick a role. No account is needed. The header menu can switch role, and it also opens the artisan's story, pay, and features.
+
+Steward. Camila Araya, O'Higgins. She sees her list of artisans, can search them, and can add someone from a sample ChileArtesanía registry lookup. She records consent and proof of hand (a photo-style record with date and place), and she can open the passports she has recorded. An online / offline switch shows a record waiting on the phone before it syncs.
+
+Artisan. Rosa Elena Muñoz, Doñihue. She sees her current order, the production stages, her payments in Chilean pesos, a short passport, and her steward. She has no bottom tabs. Her story and the pay comparison are in the menu.
+
+Creative. Maren Voss, a studio in New York. She sees a map of Chile, a product passport for the selected cluster, and sourcing requests (RFPs) with a landed-cost calculator from Doñihue to New York.
+
+Manufacturer. Patricio Vera, Cooperativa Lanas del Archipiélago, Castro, Chiloé. He sees one pooled order of 40 sweaters, which maker made how many pieces, every piece ID, two shipping cartons, and a trace box that finds a piece by ID. Opening a piece shows its passport.
+
+Government body. A Chilean public body, with no personal name in the demo. It sees the same cluster map, a passport with the technical view open, and the Features screen. Features is also in the menu for every role. The feature demos are: passport viewer, ChileArtesanía registry lookup, a tamper-proof fingerprint, escrow payouts, an ESPR field check, and proof-of-hand capture.
+
+Five Chilean clusters
+
+Doñihue, O'Higgins. Chamantos y mantas. 12 active orders, 180 artisans.
+Chiloé, Los Lagos. Wool knitwear (lana chilota). 9 active orders, 240 artisans.
+Araucanía, La Araucanía. Mapuche textiles. 14 active orders, 310 artisans.
+Colchane, Tarapacá. Aymara alpaca textiles. 6 active orders, 120 artisans.
+Quinchamalí, Ñuble. Black pottery. 5 active orders, 60 artisans.
+
+Tap a dot on the map to switch cluster. The passport on the Creative and Government screens follows the cluster you select. The steward and artisan screens stay on the Doñihue sample order. The manufacturer screen stays on the Chiloé pooled order.
+
+Sample order used on the pay screen
+
+Order FM-DON-2026 is a double-sided Doñihue chamanto for Maren Voss studio, New York. The buyer pays 625 US dollars. Of that, the artisan share is 500 US dollars (80 percent), logistics is 93.75 US dollars (15 percent), and the platform fee is 31.25 US dollars (5 percent). The demo converts dollars to pesos at 950 Chilean pesos per US dollar. Those figures are sample figures only.
