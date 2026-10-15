@@ -179,11 +179,11 @@ export const MAIN_ORDER = {
   product: "Double-sided Doñihue chamanto",
   routeFrom: "Doñihue, Chile",
   routeTo: "New York, USA",
-  dutyNote: "HTS 6211.41 (wool garments)",
+  dutyNote: "US-Chile Free Trade Agreement, subject to rules of origin",
   buyerPays: 625,
   split: {
     artisan: { usd: 500, share: 80 },
-    logistics: { usd: 93.75, share: 15, shipping: 62.75, importDuty: 31 },
+    logistics: { usd: 93.75, share: 15, shipping: 93.75, importDuty: 0 },
     platformFee: { usd: 31.25, share: 5 },
   },
   milestones: [
@@ -287,6 +287,30 @@ export const ARTISAN = {
   ),
   currency: "CLP",
 };
+
+const donihueCluster = clusterById("donihue");
+const araucaniaCluster = clusterById("araucania");
+
+export const SAMPLE_REGISTRY = [
+  {
+    id: ARTISAN.registryId,
+    name: ARTISAN.name,
+    craft: ARTISAN.craft,
+    commune: donihueCluster.name,
+    region: donihueCluster.region,
+    status: "Registered",
+  },
+  {
+    id: "CA-09-0208",
+    name: CLUSTER_PASSPORTS.araucania.artisan.split(",")[0].trim(),
+    craft: araucaniaCluster.craft,
+    commune: araucaniaCluster.region,
+    region: araucaniaCluster.region,
+    status: "Registered",
+  },
+] as const;
+
+export type SampleRegistryRecord = (typeof SAMPLE_REGISTRY)[number];
 
 export const STEWARD = {
   name: "Camila Araya",
@@ -453,19 +477,18 @@ export const EVIDENCE_LOG: EvidenceEntry[] = [
 ];
 
 export function formatClp(amount: number): string {
-  const grouped = new Intl.NumberFormat("en-US", {
+  const grouped = new Intl.NumberFormat("es-CL", {
     maximumFractionDigits: 0,
-  }).format(amount);
-  return `CLP ${grouped}`;
+  }).format(Math.round(amount));
+  return `$${grouped} CLP`;
 }
 
 export function formatUsd(amount: number): string {
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
+  const grouped = amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  return `US$${grouped}`;
 }
 
 export function passportJsonLd(input: {

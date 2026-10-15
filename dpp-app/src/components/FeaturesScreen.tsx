@@ -26,8 +26,8 @@ const CAPABILITIES: Capability[] = [
   },
   {
     id: "gov-id",
-    name: "Government ID sync",
-    description: "Pull a verified artisan profile from a national ID database.",
+    name: "ChileArtesanía registry lookup",
+    description: "Look up an artisan in Chile's Registro Nacional de Artesanía.",
   },
   {
     id: "fingerprint",
@@ -52,9 +52,19 @@ const CAPABILITIES: Capability[] = [
 ];
 
 const DATA_HANDLING = [
-  "Consent is given verbally, in the artisan's language, and recorded by the steward.",
-  "Artisans do not need an account, device or fees.",
-  "Data storage location and access rules are to be confirmed with government partners.",
+  "Consent is given verbally, in the artisan's language (Spanish, Mapudungun or Aymara), and recorded by the steward.",
+  "Artisans need no account, device or fees.",
+  "Chile's Personal Data Protection Law (Ley 21.719) applies from 1 December 2026. Ethnic origin and biometric data are treated as sensitive and require express consent.",
+  "For Mapuche and Aymara artisans, participation follows the consultation principles of ILO Convention 169.",
+  "Data storage location and access rules are to be confirmed with Chilean partners.",
+];
+
+const CHILE_CONTEXT = [
+  "Registro Nacional de Artesanía (ChileArtesanía), set in law by Ley 21.788 (2025)",
+  "Sello de Origen, INAPI (includes Chamantos y mantas de Doñihue)",
+  "US-Chile Free Trade Agreement (in force since 2004)",
+  "EU-Chile Interim Trade Agreement (in force since 2025)",
+  "EU Ecodesign for Sustainable Products Regulation (ESPR)",
 ];
 
 const PRESENT_FIELDS = ESPR_SAMPLE_FIELDS.filter((field) => field.present).map(
@@ -114,6 +124,15 @@ export function FeaturesScreen({ onOpenPassport }: Props) {
         </h2>
         <p className="mt-2 text-sm text-fm-ink">Present: {PRESENT_FIELDS.join(", ")}.</p>
         <p className="mt-1 text-sm text-fm-ink">Missing: {MISSING_FIELDS.join(", ")}.</p>
+      </section>
+
+      <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-neu">
+        <h2 className="font-display text-lg font-semibold text-fm-ink">Chile context</h2>
+        <ul className="mt-2 space-y-2 text-sm text-fm-ink">
+          {CHILE_CONTEXT.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
       </section>
 
       <DemoSheet

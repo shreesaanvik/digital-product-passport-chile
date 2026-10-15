@@ -8,7 +8,7 @@ const OTHER_USD = MAIN_ORDER.buyerPays - ARTISAN_USD;
 
 const STEPS = [
   {
-    label: `Buyer pays ${formatUsd(MAIN_ORDER.buyerPays)}. ${formatUsd(ARTISAN_USD)} artisan share held in escrow, ${formatUsd(OTHER_USD)} covers logistics and platform fee.`,
+    label: `Buyer pays ${formatUsd(MAIN_ORDER.buyerPays)}. ${formatUsd(ARTISAN_USD)} held for the artisan, ${formatUsd(OTHER_USD)} covers logistics and platform fee.`,
     paid: 0,
   },
   ...MAIN_ORDER.milestones.map((milestone, index) => {

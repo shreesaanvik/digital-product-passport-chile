@@ -164,7 +164,8 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
           id: profile.id,
           name: profile.name,
           craft: profile.craft,
-          village: profile.cluster,
+          village:
+            profile.commune === profile.region ? profile.region : profile.commune,
           status: "Verified",
           consent: null,
           orderCode: null,
@@ -327,7 +328,7 @@ export function StewardExperience({ screen }: { screen: StewardTab }) {
 
       <DemoSheet
         open={addOpen}
-        title="Government ID sync"
+        title="ChileArtesanía registry lookup"
         onClose={() => {
           setAddOpen(false);
           setVerified(null);

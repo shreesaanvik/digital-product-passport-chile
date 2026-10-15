@@ -2,39 +2,31 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { clusterById, ROSTER } from "@/lib/data";
+import { SAMPLE_REGISTRY, type SampleRegistryRecord } from "@/lib/data";
 
-const rosa = ROSTER.find((artisan) => artisan.id === "CA-06-0412");
-
-const SAMPLE_RECORDS = {
-  "CA-06-0412": {
-    name: rosa?.name ?? "Rosa Elena Muñoz",
-    craft: rosa?.craft ?? "Chamantos y mantas",
-    cluster: clusterById("donihue").name,
-    years: 18,
-  },
-  "CA-09-2208": {
-    name: "Ayelén Painemal",
-    craft: "Mapuche textiles",
-    cluster: clusterById("araucania").name,
-    years: 22,
-  },
-} as const;
-
-type SampleId = keyof typeof SAMPLE_RECORDS;
+type SampleId = SampleRegistryRecord["id"];
 
 export type VerifiedGovId = {
   id: SampleId;
   name: string;
   craft: string;
-  cluster: string;
-  years: number;
+  commune: string;
+  region: string;
 };
 
-const SAMPLE_IDS = Object.keys(SAMPLE_RECORDS) as SampleId[];
+function findRecord(raw: string): SampleRegistryRecord | null {
+  const key = raw.trim().toUpperCase();
+  return SAMPLE_REGISTRY.find((record) => record.id === key) ?? null;
+}
 
-function isSampleId(value: string): value is SampleId {
-  return Object.prototype.hasOwnProperty.call(SAMPLE_RECORDS, value);
+function placeRows(record: SampleRegistryRecord) {
+  if (record.commune === record.region) {
+    return [{ label: "Commune and region", value: record.region }];
+  }
+  return [
+    { label: "Commune", value: record.commune },
+    { label: "Region", value: record.region },
+  ];
 }
 
 type Phase = "idle" | "searching" | "found" | "missing";
@@ -46,9 +38,7 @@ type Props = {
 export function GovIdSyncDemo({ onVerified }: Props = {}) {
   const [id, setId] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
-  const [profile, setProfile] = useState<(typeof SAMPLE_RECORDS)[SampleId] | null>(
-    null,
-  );
+  const [profile, setProfile] = useState<SampleRegistryRecord | null>(null);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -70,19 +60,25 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
     clearTimer();
     setProfile(null);
 
-    if (!isSampleId(key)) {
+    const record = findRecord(key);
+    if (!record) {
       setPhase("missing");
       onVerified?.(null);
       return;
     }
 
-    const record = SAMPLE_RECORDS[key];
     setPhase("searching");
     onVerified?.(null);
     timer.current = window.setTimeout(() => {
       setProfile(record);
       setPhase("found");
-      onVerified?.({ id: key, ...record });
+      onVerified?.({
+        id: record.id,
+        name: record.name,
+        craft: record.craft,
+        commune: record.commune,
+        region: record.region,
+      });
       timer.current = null;
     }, 1500);
   }
@@ -121,14 +117,14 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
       <div>
         <p className="mb-2 text-sm text-fm-muted">Sample IDs</p>
         <div className="flex flex-wrap gap-2">
-          {SAMPLE_IDS.map((sampleId) => (
+          {SAMPLE_REGISTRY.map((record) => (
             <button
-              key={sampleId}
+              key={record.id}
               type="button"
-              onClick={() => check(sampleId)}
+              onClick={() => check(record.id)}
               className="min-h-[44px] rounded-full border border-fm-blue/30 bg-fm-btn-light px-4 text-sm font-semibold text-fm-btn-text"
             >
-              {sampleId}
+              {record.id}
             </button>
           ))}
         </div>
@@ -143,13 +139,13 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
             className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-fm-blue/30 border-t-fm-blue motion-reduce:animate-none"
             aria-hidden
           />
-          Contacting national registry
+          Checking Registro Nacional de Artesanía
         </p>
       )}
 
       {phase === "missing" && (
         <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800" role="status">
-          ID not found.
+          No artisan with that number in the sample registry.
         </p>
       )}
 
@@ -168,16 +164,18 @@ export function GovIdSyncDemo({ onVerified }: Props = {}) {
                 <dt className="text-fm-muted">Craft</dt>
                 <dd className="text-right text-fm-ink">{profile.craft}</dd>
               </div>
+              {placeRows(profile).map((row) => (
+                <div key={row.label} className="flex justify-between gap-3">
+                  <dt className="text-fm-muted">{row.label}</dt>
+                  <dd className="text-right text-fm-ink">{row.value}</dd>
+                </div>
+              ))}
               <div className="flex justify-between gap-3">
-                <dt className="text-fm-muted">Cluster</dt>
-                <dd className="text-right text-fm-ink">{profile.cluster}</dd>
-              </div>
-              <div className="flex justify-between gap-3">
-                <dt className="text-fm-muted">Years of practice</dt>
-                <dd className="text-right text-fm-ink">{profile.years}</dd>
+                <dt className="text-fm-muted">Registry number</dt>
+                <dd className="text-right text-fm-ink">{profile.id}</dd>
               </div>
             </dl>
-            <p className="mt-3 font-semibold text-fm-ink">Verified</p>
+            <p className="mt-3 font-semibold text-fm-ink">{profile.status}</p>
           </motion.div>
         )}
       </AnimatePresence>

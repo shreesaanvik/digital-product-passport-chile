@@ -113,7 +113,8 @@ export function EsprCheckDemo() {
       )}
 
       <p className="text-sm text-fm-muted">
-        Final textile requirements under ESPR are still being set by the EU.
+        Final textile requirements under ESPR are still being set by the EU. This
+        check applies to textile passports.
       </p>
     </div>
   );
